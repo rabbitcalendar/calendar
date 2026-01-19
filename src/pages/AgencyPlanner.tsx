@@ -164,22 +164,22 @@ export const AgencyPlanner = () => {
     }
   }, [activeId]);
 
-  // Auto-collapse unscheduled sidebar on mobile
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsUnscheduledOpen(false);
-      } else {
-        setIsUnscheduledOpen(true);
-      }
-    };
+  // Auto-collapse unscheduled sidebar on mobile - REMOVED to keep it open by default
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth < 768) {
+  //       setIsUnscheduledOpen(false);
+  //     } else {
+  //       setIsUnscheduledOpen(true);
+  //     }
+  //   };
     
-    // Initial check
-    handleResize();
+  //   // Initial check
+  //   handleResize();
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  //   window.addEventListener('resize', handleResize);
+  //   return () => window.removeEventListener('resize', handleResize);
+  // }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
