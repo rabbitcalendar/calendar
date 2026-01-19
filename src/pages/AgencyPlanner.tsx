@@ -28,6 +28,7 @@ import {
   addWeeks, 
 } from 'date-fns';
 import { ChevronLeft, ChevronRight, Plus, X, LayoutGrid, Columns, List, LayoutList } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 type CalendarView = 'month' | 'week' | 'list';
 
@@ -156,6 +157,7 @@ export const AgencyPlanner = () => {
   const [editingPost, setEditingPost] = useState<Partial<SocialPost>>({});
   const [editingEvent, setEditingEvent] = useState<Partial<CalendarEvent>>({});
   const [isUnscheduledOpen, setIsUnscheduledOpen] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Force expand sidebar when dragging
   useEffect(() => {
@@ -270,6 +272,47 @@ export const AgencyPlanner = () => {
     if (editingPost.id) {
       deletePost(editingPost.id);
       setIsModalOpen(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    if (!isSupabaseConfigured || !supabase) {
+      alert("Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file.");
+      return;
+    }
+
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    setIsUploading(true);
+
+    try {
+      // Upload file to 'uploads' bucket
+      // User must create a bucket named 'uploads' in Supabase dashboard
+      const { error: uploadError } = await supabase.storage
+        .from('uploads')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data } = supabase.storage.from('uploads').getPublicUrl(filePath);
+      
+      setEditingPost(prev => ({
+        ...prev,
+        imageUrl: data.publicUrl
+      }));
+    } catch (error: any) {
+      console.error('Error uploading image:', error.message);
+      alert(`Error uploading image: ${error.message}. Make sure you have created a public storage bucket named 'uploads' in your Supabase project.`);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -566,6 +609,52 @@ export const AgencyPlanner = () => {
                   <option value="scheduled">Scheduled</option>
                   <option value="published">Published</option>
                 </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <div className="space-y-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  {/* Upload Option */}
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Upload File</label>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      disabled={isUploading}
+                      className="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-xs file:font-semibold
+                        file:bg-indigo-50 file:text-indigo-700
+                        hover:file:bg-indigo-100 cursor-pointer"
+                    />
+                    {isUploading && <p className="text-xs text-indigo-600 mt-1 animate-pulse">Uploading to Supabase...</p>}
+                  </div>
+
+                  <div className="relative flex items-center py-2">
+                    <div className="flex-grow border-t border-gray-200"></div>
+                    <span className="flex-shrink-0 mx-4 text-xs font-medium text-gray-400">OR PASTE URL</span>
+                    <div className="flex-grow border-t border-gray-200"></div>
+                  </div>
+
+                  {/* URL Option */}
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Image URL</label>
+                    <input 
+                      type="url" 
+                      className="w-full px-3 py-2 border rounded-lg text-sm bg-white"
+                      placeholder="https://example.com/image.jpg"
+                      value={editingPost.imageUrl || ''}
+                      onChange={e => setEditingPost({...editingPost, imageUrl: e.target.value})}
+                    />
+                    {editingPost.imageUrl && (
+                      <div className="mt-2 relative aspect-video w-full rounded-lg overflow-hidden border border-gray-200">
+                        <img src={editingPost.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Brief / Details</label>
