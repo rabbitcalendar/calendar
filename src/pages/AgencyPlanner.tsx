@@ -135,9 +135,11 @@ const UnscheduledSidebar = ({
             <br />Drag items here to unschedule.
           </div>
         ) : (
-          unscheduledPosts.map(post => (
-            <PostCard key={post.id} post={post} onClick={() => onEditPost(post)} />
-          ))
+          <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
+            {unscheduledPosts.map(post => (
+              <PostCard key={post.id} post={post} onClick={() => onEditPost(post)} />
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -363,31 +365,57 @@ export const AgencyPlanner = () => {
           
           {/* Header */}
           <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-              <h2 className="text-xl font-bold text-gray-900 min-w-[200px] text-center sm:text-left">
+            {/* Mobile: Row 1 - Title + Nav Controls */}
+            {/* Desktop: Title + View Toggles + Nav Controls */}
+            
+            <div className="w-full flex flex-row items-center justify-between sm:w-auto sm:justify-start gap-4">
+              <h2 className="text-xl font-bold text-gray-900 text-left">
                 {view === 'week' 
                   ? `Week of ${format(startOfWeek(currentDate), 'MMM d')}`
                   : format(currentDate, 'MMMM yyyy')
                 }
               </h2>
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
+
+              {/* Mobile Only Nav Controls (Moved up) */}
+              <div className="flex items-center gap-2 sm:hidden">
+                <button 
+                  onClick={() => {
+                    const sgDateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Singapore"});
+                    setCurrentDate(new Date(sgDateString));
+                  }}
+                  className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm"
+                >
+                  Today
+                </button>
+                <div className="h-5 w-px bg-gray-200 mx-0.5"></div>
+                <button onClick={() => navigate('prev')} className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer">
+                  <ChevronLeft className="w-4 h-4 text-gray-600" />
+                </button>
+                <button onClick={() => navigate('next')} className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer">
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <div className="w-full flex items-center justify-center sm:w-auto">
+              <div className="flex items-center bg-gray-100 rounded-lg p-1 w-full sm:w-auto justify-center">
                 <button
                   onClick={() => setView('month')}
-                  className={`p-2 rounded-md transition-all ${view === 'month' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'month' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="Month View"
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setView('week')}
-                  className={`p-2 rounded-md transition-all ${view === 'week' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'week' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="Week View"
                 >
                   <Columns className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setView('list')}
-                  className={`p-2 rounded-md transition-all ${view === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="List View"
                 >
                   <List className="w-4 h-4" />
@@ -395,7 +423,8 @@ export const AgencyPlanner = () => {
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            {/* Desktop Only Nav Controls */}
+            <div className="hidden sm:flex items-center gap-2">
               <button 
                 onClick={() => {
                   const sgDateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Singapore"});
