@@ -21,7 +21,7 @@ const PrivateRoute = ({ children }: { children: ReactElement }) => {
 function App() {
   return (
     <CalendarProvider>
-      <BrowserRouter basename="/">
+      <BrowserRouter basename="/calendar">
         <Routes>
           <Route path="/login" element={<Login />} />
           

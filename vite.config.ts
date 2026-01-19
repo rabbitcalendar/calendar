@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/', // Use root for development simplicity
+  base: '/calendar/', // Base URL for production
   server: {
     host: true,
     port: 3000,
