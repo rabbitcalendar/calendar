@@ -396,6 +396,16 @@ export const AgencyPlanner = () => {
             </div>
             
             <div className="flex items-center gap-2">
+              <button 
+                onClick={() => {
+                  const sgDateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Singapore"});
+                  setCurrentDate(new Date(sgDateString));
+                }}
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm"
+              >
+                Today
+              </button>
+              <div className="h-6 w-px bg-gray-200 mx-1"></div>
               <button onClick={() => navigate('prev')} className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
                 <ChevronLeft className="w-5 h-5 text-gray-600" />
               </button>

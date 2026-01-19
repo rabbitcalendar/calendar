@@ -178,7 +178,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <div className={`w-2 h-2 rounded-full ${isSupabaseConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
-            <span>{isSupabaseConnected ? 'Online (Supabase)' : 'Offline (Local)'}</span>
+            <span>{isSupabaseConnected ? 'Online' : 'Offline'}</span>
           </div>
         </div>
       </div>
