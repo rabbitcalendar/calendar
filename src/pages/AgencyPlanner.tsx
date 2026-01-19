@@ -29,6 +29,7 @@ import {
 } from 'date-fns';
 import { ChevronLeft, ChevronRight, Plus, X, LayoutGrid, Columns, List, LayoutList } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { compressImage } from '../utils/compressImage';
 
 type CalendarView = 'month' | 'week' | 'list';
 
@@ -284,18 +285,22 @@ export const AgencyPlanner = () => {
     }
 
     const file = e.target.files[0];
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-    const filePath = `${fileName}`;
 
     setIsUploading(true);
 
     try {
-      // Upload file to 'uploads' bucket
+      // 1. Compress the image before uploading
+      // Resize to max 1200px width, 0.8 quality (WebP)
+      const compressedFile = await compressImage(file, 1200, 0.8);
+
+      // 2. Upload compressed file to 'uploads' bucket
       // User must create a bucket named 'uploads' in Supabase dashboard
+      // Use the new compressed file name (which has .webp extension)
+      const filePath = `${Date.now()}_${Math.random().toString(36).substring(2)}.webp`;
+      
       const { error: uploadError } = await supabase.storage
         .from('uploads')
-        .upload(filePath, file);
+        .upload(filePath, compressedFile);
 
       if (uploadError) {
         throw uploadError;
