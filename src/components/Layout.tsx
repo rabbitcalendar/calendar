@@ -7,9 +7,7 @@ import {
   Menu, 
   X,
   LogOut,
-  ChevronDown,
-  User,
-  Settings
+  ChevronDown
 } from 'lucide-react';
 import { useCalendar } from '../context/CalendarContext';
 import ClientManager from './ClientManager';

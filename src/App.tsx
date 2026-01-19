@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ClientInput } from './pages/ClientInput';
@@ -6,7 +7,7 @@ import Login from './pages/Login';
 import { CalendarProvider, useCalendar } from './context/CalendarContext';
 
 // Protected Route Component
-const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+const PrivateRoute = ({ children }: { children: ReactElement }) => {
   const { user } = useCalendar();
   const location = useLocation();
 

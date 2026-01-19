@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useCalendar } from '../context/CalendarContext';
-import { Plus, Trash2, Key, X, Save } from 'lucide-react';
-import type { Client } from '../types';
+import { Plus, Trash2, Key, X } from 'lucide-react';
 
 const ClientManager = () => {
   const { clients, addClient, deleteClient, resetPassword } = useCalendar();

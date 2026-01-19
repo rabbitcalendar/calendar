@@ -27,7 +27,7 @@ import {
   addMonths, 
   addWeeks, 
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Plus, X, LayoutGrid, Columns, List, LayoutList, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, LayoutGrid, Columns, List, LayoutList } from 'lucide-react';
 
 type CalendarView = 'month' | 'week' | 'list';
 
@@ -144,7 +144,7 @@ const UnscheduledSidebar = ({
 };
 
 export const AgencyPlanner = () => {
-  const { events, posts, movePost, addPost, updatePost, deletePost, addEvent, updateEvent, deleteEvent, user } = useCalendar();
+  const { events, posts, movePost, addPost, updatePost, deletePost, addEvent, updateEvent, deleteEvent } = useCalendar();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>('month');
   const [activeId, setActiveId] = useState<string | null>(null);
