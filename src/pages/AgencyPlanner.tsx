@@ -97,10 +97,11 @@ const UnscheduledSidebar = ({
         ) : (
           <button 
             onClick={() => setIsUnscheduledOpen(true)}
-            className="w-full h-full flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors"
+            className="w-full h-full flex items-center justify-center md:justify-center text-gray-400 hover:text-indigo-600 transition-colors gap-2"
             title="Open Unscheduled"
           >
             <LayoutList className="w-6 h-6" />
+            <span className="font-semibold md:hidden text-gray-700">Unscheduled</span>
           </button>
         )}
       </div>
