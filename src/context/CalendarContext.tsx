@@ -178,7 +178,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     
     // Determine redirect URL based on environment
     // Use window.location.origin to dynamically handle localhost vs production
-    const redirectTo = `${window.location.origin}/`; 
+    const redirectTo = window.location.origin; 
     
     await supabase.auth.signInWithOAuth({
       provider,
