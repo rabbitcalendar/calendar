@@ -315,7 +315,11 @@ export const AgencyPlanner = () => {
       }));
     } catch (error: any) {
       console.error('Error uploading image:', error.message);
-      alert(`Error uploading image: ${error.message}. Make sure you have created a public storage bucket named 'uploads' in your Supabase project.`);
+      if (error.message.includes('row-level security')) {
+        alert(`Supabase Security Block: You must add a "Policy" in your Supabase Dashboard.\n\n1. Go to Storage > Policies.\n2. Under 'uploads', click 'New Policy'.\n3. Choose 'For full customization'.\n4. Name it 'Allow Public Uploads'.\n5. Check 'INSERT' and 'SELECT'.\n6. Select 'anon' role (since you are not using Supabase Auth).`);
+      } else {
+        alert(`Error uploading image: ${error.message}. Make sure you have created a public storage bucket named 'uploads' in your Supabase project.`);
+      }
     } finally {
       setIsUploading(false);
     }
