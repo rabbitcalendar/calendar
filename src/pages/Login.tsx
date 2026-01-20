@@ -28,9 +28,12 @@ const Login = () => {
     try {
       if (isSignUp) {
         // Sign Up Mode
-        const { error } = await signUp(username, password, name);
+        const { data, error } = await signUp(username, password, name);
         if (error) {
           setError(error.message || 'Error signing up');
+        } else if (data?.session) {
+          // Auto-login successful (Email confirmation might be disabled)
+          navigate('/');
         } else {
           setMessage('Account created! Please check your email to confirm, or try logging in.');
           setIsSignUp(false);

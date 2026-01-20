@@ -16,7 +16,7 @@ interface CalendarContextType {
   // Auth
   login: (username: string, password: string) => Promise<boolean>;
   signInWithOAuth: (provider: 'google' | 'apple') => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, name: string) => Promise<{ data?: any; error: any }>;
   logout: () => void;
   
   // Client Management
@@ -197,7 +197,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, name: string) => {
     if (!supabase) return { error: { message: 'Supabase not configured' } };
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -207,7 +207,11 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       },
     });
 
-    return { error };
+    if (data?.session) {
+      setIsLoading(true);
+    }
+
+    return { data, error };
   };
 
   const logout = () => {
