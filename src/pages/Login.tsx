@@ -3,7 +3,6 @@ import { useCalendar } from '../context/CalendarContext';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, LayoutDashboard, Mail } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-import { FaApple } from 'react-icons/fa';
 
 const Login = () => {
   const [username, setUsername] = useState('');
