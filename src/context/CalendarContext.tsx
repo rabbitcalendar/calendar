@@ -236,11 +236,20 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       
       try {
         // Check if user exists in our clients table
-        const { data: existingClient } = await client
+        // We use a timeout to prevent this from hanging indefinitely
+        const fetchPromise = client
           .from('clients')
           .select('*')
           .eq('id', session.user.id)
           .single();
+          
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('User data fetch timed out')), 5000)
+        );
+
+        // Race the fetch against the timeout
+        const result: any = await Promise.race([fetchPromise, timeoutPromise]);
+        const existingClient = result?.data;
 
         if (existingClient) {
           const clientData: Client = { ...existingClient, themeColor: existingClient.theme_color || 'indigo' };
@@ -286,6 +295,14 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
 
     // Initialize Auth
     const initAuth = async () => {
+      // Safety timer to ensure we don't spin forever
+      const safetyTimer = setTimeout(() => {
+        if (mounted) {
+          console.warn('Auth initialization timed out, forcing load completion');
+          setIsLoading(false);
+        }
+      }, 7000);
+
       try {
         // Check if we have a hash in the URL (OAuth redirect)
         // If we do, we want to wait for onAuthStateChange to fire instead of just checking getSession
@@ -296,6 +313,10 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
           // If we have an auth hash, we DON'T set isLoading(false) here.
           // We let onAuthStateChange handle it.
           // However, we should set a timeout just in case it fails.
+          // The outer safetyTimer will also catch this if the inner one fails or is forgotten, 
+          // but we'll clear the outer one since we have specific handling here.
+          clearTimeout(safetyTimer);
+          
           setTimeout(() => {
             if (mounted) setIsLoading(false);
           }, 5000);
@@ -309,6 +330,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       } catch (err) {
         console.error('Auth initialization error:', err);
       } finally {
+        clearTimeout(safetyTimer);
         // Only turn off loading if we didn't defer to the hash handler
         const hasAuthHash = window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error_description'));
         if (!hasAuthHash && mounted) {
@@ -322,9 +344,14 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     // Listen for changes
     const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        await loadUserFromSession(session);
-        // Ensure loading is turned off after successful sign in
-        if (mounted) setIsLoading(false);
+        try {
+          await loadUserFromSession(session);
+        } catch (e) {
+          console.error('Error handling auth state change:', e);
+        } finally {
+          // Ensure loading is turned off after successful sign in or if it fails
+          if (mounted) setIsLoading(false);
+        }
       } else if (event === 'SIGNED_OUT') {
         if (mounted) {
           setUser(null);
