@@ -39,13 +39,26 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'approved': return 'border-l-4 border-l-green-500';
-      case 'scheduled': return 'border-l-4 border-l-blue-500';
-      case 'published': return 'border-l-4 border-l-gray-500';
-      default: return 'border-l-4 border-l-yellow-500'; // draft
-    }
+  const getStatusRibbon = (status: string) => {
+    const config = {
+      approved: { bg: 'bg-green-500', text: 'APPROVED' },
+      scheduled: { bg: 'bg-blue-500', text: 'SCHEDULED' },
+      published: { bg: 'bg-gray-500', text: 'PUBLISHED' },
+      draft: { bg: 'bg-yellow-500', text: 'DRAFT' },
+    };
+    const style = config[status as keyof typeof config] || config.draft;
+
+    return (
+      <div className="absolute top-0 right-0 overflow-hidden w-16 h-16 pointer-events-none">
+        <div className={`
+          absolute top-0 right-0 transform translate-x-[30%] translate-y-[-20%] rotate-45 
+          w-[100px] text-center text-[8px] font-bold text-white tracking-wider py-1
+          shadow-sm ${style.bg} z-10
+        `}>
+          {style.text}
+        </div>
+      </div>
+    );
   };
 
   const coverImage = post.images?.[0] || post.imageUrl;
@@ -58,11 +71,12 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
       {...attributes}
       onClick={onClick}
       className={`
-        bg-white p-2 rounded shadow-sm border border-gray-200 text-xs 
+        bg-white p-2 rounded shadow-sm border border-gray-200 text-xs overflow-hidden
         ${isOverlay ? 'cursor-grabbing shadow-xl ring-2 ring-primary-500 pointer-events-none' : 'cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow'} 
-        group relative ${getStatusColor(post.status)}
+        group relative
       `}
     >
+      {getStatusRibbon(post.status)}
       {coverImage && (
         <div className="mb-2 -mx-2 -mt-2 rounded-t overflow-hidden aspect-video relative bg-gray-100">
            <img 
