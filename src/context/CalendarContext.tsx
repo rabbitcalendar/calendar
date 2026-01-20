@@ -177,8 +177,13 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     if (!supabase) return;
     
     // Determine redirect URL based on environment
-    // Use window.location.origin to dynamically handle localhost vs production
-    const redirectTo = window.location.origin; 
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    // If local, use origin (http://localhost:3000)
+    // If production (rabbit.com.sg), append /calendar since the app lives in a subdirectory
+    const redirectTo = isLocal 
+      ? window.location.origin 
+      : `${window.location.origin}/calendar`;
     
     await supabase.auth.signInWithOAuth({
       provider,
