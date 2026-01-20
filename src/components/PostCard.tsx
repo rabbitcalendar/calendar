@@ -49,10 +49,10 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
     const style = config[status as keyof typeof config] || config.draft;
 
     return (
-      <div className="absolute top-0 right-0 overflow-hidden w-16 h-16 pointer-events-none">
+      <div className="absolute top-0 right-0 overflow-hidden w-20 h-20 pointer-events-none">
         <div className={`
-          absolute top-0 right-0 transform translate-x-[30%] translate-y-[-20%] rotate-45 
-          w-[100px] text-center text-[8px] font-bold text-white tracking-wider py-1
+          absolute top-[12px] -right-[22px] transform rotate-45 
+          w-[100px] text-center text-[9px] font-bold text-white tracking-wider py-1
           shadow-sm ${style.bg} z-10
         `}>
           {style.text}
