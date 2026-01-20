@@ -11,6 +11,7 @@ interface CalendarContextType {
   clients: Client[];
   currentClient: Client | null;
   user: Client | null; // Currently logged in user
+  isLoading: boolean;
   
   // Auth
   login: (username: string, password: string) => Promise<boolean>;
@@ -217,10 +218,22 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     if (supabase) supabase.auth.signOut();
   };
 
+  const [isLoading, setIsLoading] = useState(true);
+
   // Sync Auth State
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      setIsLoading(false);
+      return;
+    }
     const client = supabase;
+
+    // Check initial session
+    client.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        setIsLoading(false);
+      }
+    });
 
     const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
@@ -271,12 +284,15 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem('calendar_user');
         localStorage.removeItem('calendar_current_client');
       }
+      
+      setIsLoading(false);
     });
 
     return () => {
       subscription.unsubscribe();
     };
   }, []);
+
 
   // Sync Logic
   useEffect(() => {
@@ -557,6 +573,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         clients,
         currentClient,
         user,
+        isLoading,
         login,
         signInWithOAuth,
         signUp,
