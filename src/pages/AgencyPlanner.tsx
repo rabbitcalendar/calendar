@@ -37,11 +37,7 @@ import {
   List, 
   LayoutList, 
   Trash2, 
-  Eye, 
   Maximize2,
-  GripVertical,
-  Calendar as CalendarIcon,
-  Filter,
   AlertCircle
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
