@@ -207,6 +207,49 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       },
     });
 
+    if (data?.user && !error) {
+      // Create Client record immediately to ensure it exists
+      const newClient: Client = {
+        id: data.user.id,
+        name: name || email.split('@')[0] || 'Client',
+        username: email,
+        password: 'oauth-managed', // Supabase Auth manages password
+        role: 'client',
+        themeColor: 'indigo'
+      };
+
+      try {
+        const { error: insertError } = await supabase.from('clients').insert([
+          {
+            id: newClient.id,
+            name: newClient.name,
+            username: newClient.username,
+            password: newClient.password,
+            role: newClient.role,
+            theme_color: newClient.themeColor
+          }
+        ]);
+
+        if (insertError) {
+          console.error('Error creating client record:', insertError);
+          // We don't block the signup success here, but we log it.
+          // The loadUserFromSession will try again if it's missing.
+        } else {
+          // Update local state if we have a session (auto-login)
+          if (data.session) {
+             // Let loadUserFromSession handle state update via onAuthStateChange
+             // But we can optimistically add to clients list
+             setClients(prev => {
+               if (prev.some(c => c.id === newClient.id)) return prev;
+               return [...prev, newClient];
+             });
+          }
+        }
+      } catch (err) {
+        console.error('Exception creating client record:', err);
+      }
+    }
+
     if (data?.session) {
       setIsLoading(true);
     }
