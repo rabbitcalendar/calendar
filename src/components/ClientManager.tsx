@@ -49,7 +49,7 @@ const ClientManager = () => {
         <h2 className="text-xl font-semibold text-gray-800">Client Management</h2>
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add New Client
@@ -82,7 +82,7 @@ const ClientManager = () => {
                   <div className="flex justify-end space-x-3">
                     <button
                       onClick={() => openResetModal(client.id)}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="text-primary-600 hover:text-primary-900"
                       title="Change Password"
                     >
                       <Key className="w-4 h-4" />
@@ -155,7 +155,7 @@ const ClientManager = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
                 >
                   Add Client
                 </button>
@@ -196,7 +196,7 @@ const ClientManager = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
                 >
                   Reset Password
                 </button>
@@ -234,7 +234,7 @@ const ClientManager = () => {
                 </button>
                 <button
                   onClick={handleResetPassword}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   Update Password
                 </button>

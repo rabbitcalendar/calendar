@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { CalendarEvent, SocialPost, Client } from '../types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { applyTheme } from '../lib/theme';
 
 interface CalendarContextType {
   events: CalendarEvent[];
@@ -20,6 +21,7 @@ interface CalendarContextType {
   addClient: (client: Client) => void;
   deleteClient: (id: string) => void;
   resetPassword: (id: string, newPassword: string) => void;
+  updateClientProfile: (id: string, data: { name?: string; username?: string; password?: string; themeColor?: string }) => Promise<void>;
   
   // Data
   addEvent: (event: CalendarEvent) => void;
@@ -177,7 +179,11 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         // If we get data, use it. If table exists but is empty, use it (empty array).
         // If table doesn't exist (error), we fall to catch block.
         if (clientsData) {
-          setClients(clientsData);
+          const mappedClients = clientsData.map((c: any) => ({
+            ...c,
+            themeColor: c.theme_color || 'indigo'
+          }));
+          setClients(mappedClients);
         }
       } catch (err) {
         console.warn('Supabase Error (Clients):', err);
@@ -253,6 +259,15 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('calendar_project_name', projectName);
   }, [projectName]);
 
+  // Apply Theme
+  useEffect(() => {
+    if (user?.themeColor) {
+      applyTheme(user.themeColor);
+    } else {
+      applyTheme('indigo');
+    }
+  }, [user?.themeColor]);
+
   // CRUD Operations
   const addClient = async (client: Client) => {
     // Only Agency can add clients
@@ -281,15 +296,52 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const resetPassword = async (id: string, newPassword: string) => {
-    if (user?.role !== 'agency') return;
+    // Allow agency to reset anyone's password
+    // Allow users to reset their own password
+    if (user?.role !== 'agency' && user?.id !== id) return;
 
     const updatedClients = clients.map(c => 
       c.id === id ? { ...c, password: newPassword } : c
     );
     setClients(updatedClients);
     
+    // Update current user if it's them
+    if (user?.id === id) {
+      setUser({ ...user, password: newPassword });
+    }
+    
     if (isSupabaseConfigured && supabase) {
       await supabase.from('clients').update({ password: newPassword }).eq('id', id);
+    }
+  };
+
+  const updateClientProfile = async (id: string, data: { name?: string; username?: string; password?: string; themeColor?: string }) => {
+    // Allow agency to update anyone
+    // Allow users to update themselves
+    if (user?.role !== 'agency' && user?.id !== id) return;
+
+    const updatedClients = clients.map(c => 
+      c.id === id ? { ...c, ...data } : c
+    );
+    setClients(updatedClients);
+
+    // Update current user if it's them
+    if (user?.id === id) {
+      setUser(prev => prev ? { ...prev, ...data } : null);
+    }
+    
+    // Update currentClient if it's them
+    if (currentClient?.id === id) {
+      setCurrentClientState(prev => prev ? { ...prev, ...data } : null);
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      const dbData: any = { ...data };
+      if (data.themeColor) {
+        dbData.theme_color = data.themeColor;
+        delete dbData.themeColor;
+      }
+      await supabase.from('clients').update(dbData).eq('id', id);
     }
   };
 
@@ -397,6 +449,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         addClient,
         deleteClient,
         resetPassword,
+        updateClientProfile,
         addEvent,
         updateEvent,
         deleteEvent,

@@ -78,7 +78,7 @@ const UnscheduledSidebar = ({
       id="unscheduled-sidebar"
       className={`
         flex-shrink-0 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-none relative
-        ${isOver ? 'bg-indigo-50 border-indigo-200' : ''}
+        ${isOver ? 'bg-primary-50 border-primary-200' : ''}
         ${activeId ? 'z-50' : ''}
         ${isUnscheduledOpen ? 'h-64 md:h-full md:w-64' : 'h-14 md:h-full md:w-12'}
       `}
@@ -88,13 +88,13 @@ const UnscheduledSidebar = ({
         {isUnscheduledOpen ? (
           <>
             <h3 className="font-semibold text-gray-700 flex items-center gap-2">
-              <LayoutList className="w-5 h-5 text-indigo-600" />
+              <LayoutList className="w-5 h-5 text-primary-600" />
               Unscheduled
             </h3>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => onAddPost()}
-                className="p-1 hover:bg-gray-200 rounded-full text-gray-400 hover:text-indigo-600 transition-colors"
+                className="p-1 hover:bg-gray-200 rounded-full text-gray-400 hover:text-primary-600 transition-colors"
                 title="Add Post"
               >
                 <Plus className="w-5 h-5" />
@@ -110,7 +110,7 @@ const UnscheduledSidebar = ({
         ) : (
           <button 
             onClick={() => setIsUnscheduledOpen(true)}
-            className="w-full h-full flex items-center justify-center md:justify-center text-gray-400 hover:text-indigo-600 transition-colors gap-2"
+            className="w-full h-full flex items-center justify-center md:justify-center text-gray-400 hover:text-primary-600 transition-colors gap-2"
             title="Open Unscheduled"
           >
             <LayoutList className="w-6 h-6" />
@@ -124,10 +124,10 @@ const UnscheduledSidebar = ({
         {activeId && (
           <div className={`absolute inset-0 z-20 border-2 border-dashed rounded-lg pointer-events-none flex items-center justify-center transition-colors ${
             isOver 
-              ? 'bg-indigo-100/80 border-indigo-500' 
-              : 'bg-indigo-50/50 border-indigo-300'
+              ? 'bg-primary-100/80 border-primary-500' 
+              : 'bg-primary-50/50 border-primary-300'
           }`}>
-            <span className={`text-indigo-500 font-medium transition-transform ${isOver ? 'font-bold scale-105' : ''}`}>
+            <span className={`text-primary-500 font-medium transition-transform ${isOver ? 'font-bold scale-105' : ''}`}>
               Drop Here to Unschedule
             </span>
           </div>
@@ -502,7 +502,7 @@ export const AgencyPlanner = () => {
                     const sgDateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Singapore"});
                     setCurrentDate(new Date(sgDateString));
                   }}
-                  className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm"
+                  className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors shadow-sm"
                 >
                   Today
                 </button>
@@ -520,21 +520,21 @@ export const AgencyPlanner = () => {
               <div className="flex items-center bg-gray-100 rounded-lg p-1 w-full sm:w-auto justify-center">
                 <button
                   onClick={() => setView('month')}
-                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'month' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'month' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="Month View"
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setView('week')}
-                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'week' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'week' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="Week View"
                 >
                   <Columns className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setView('list')}
-                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'list' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="List View"
                 >
                   <List className="w-4 h-4" />
@@ -549,7 +549,7 @@ export const AgencyPlanner = () => {
                   const sgDateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Singapore"});
                   setCurrentDate(new Date(sgDateString));
                 }}
-                className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm"
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors shadow-sm"
               >
                 Today
               </button>
@@ -702,10 +702,10 @@ export const AgencyPlanner = () => {
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-full file:border-0
                         file:text-xs file:font-semibold
-                        file:bg-indigo-50 file:text-indigo-700
-                        hover:file:bg-indigo-100 file:cursor-pointer cursor-pointer"
+                        file:bg-primary-50 file:text-primary-700
+                        hover:file:bg-primary-100 file:cursor-pointer cursor-pointer"
                     />
-                    {isUploading && <p className="text-xs text-indigo-600 mt-1 animate-pulse">Uploading to Supabase...</p>}
+                    {isUploading && <p className="text-xs text-primary-600 mt-1 animate-pulse">Uploading to Supabase...</p>}
                   </div>
 
                   <div className="relative flex items-center py-2">
@@ -834,7 +834,7 @@ export const AgencyPlanner = () => {
                 )}
                 <div className={editingPost.id ? '' : 'ml-auto'}>
                   <button type="button" onClick={() => setIsModalOpen(false)} className="mr-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg cursor-pointer">Save Post</button>
+                  <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer">Save Post</button>
                 </div>
               </div>
             </form>
@@ -860,7 +860,7 @@ export const AgencyPlanner = () => {
                 <input
                   type="text"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   value={editingEvent.title || ''}
                   onChange={e => setEditingEvent({...editingEvent, title: e.target.value})}
                 />
@@ -871,7 +871,7 @@ export const AgencyPlanner = () => {
                   <input
                     type="date"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     value={editingEvent.date || ''}
                     onChange={e => setEditingEvent({...editingEvent, date: e.target.value})}
                   />
@@ -879,7 +879,7 @@ export const AgencyPlanner = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     value={editingEvent.type || 'event'}
                     onChange={e => setEditingEvent({...editingEvent, type: e.target.value as any})}
                   >
@@ -893,7 +893,7 @@ export const AgencyPlanner = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 h-24"
                   value={editingEvent.description || ''}
                   onChange={e => setEditingEvent({...editingEvent, description: e.target.value})}
                 />
@@ -911,7 +911,7 @@ export const AgencyPlanner = () => {
                 )}
                 <div className={editingEvent.id ? '' : 'ml-auto'}>
                   <button type="button" onClick={() => setIsEventModalOpen(false)} className="mr-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg cursor-pointer">Save Event</button>
+                  <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer">Save Event</button>
                 </div>
               </div>
             </form>

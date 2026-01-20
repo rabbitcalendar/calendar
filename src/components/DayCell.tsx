@@ -36,13 +36,13 @@ export const DayCell = ({
       className={`
         p-2 border border-gray-100 flex flex-col gap-2 transition-colors group
         ${isCurrentMonth ? 'bg-white' : 'bg-gray-50/50'} 
-        ${isOver ? 'bg-indigo-50 ring-2 ring-inset ring-indigo-200' : ''}
+        ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-200' : ''}
         ${variant === 'week' ? 'min-h-[300px]' : 'min-h-[120px]'}
       `}
     >
       <div className="flex justify-between items-start">
         <div className="flex flex-col">
-          <span className={`text-sm font-medium ${isSameDay(date, new Date()) ? 'bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full' : 'text-gray-400'}`}>
+          <span className={`text-sm font-medium ${isSameDay(date, new Date()) ? 'bg-primary-600 text-white w-6 h-6 flex items-center justify-center rounded-full' : 'text-gray-400'}`}>
             {format(date, 'd')}
           </span>
           {variant === 'week' && (

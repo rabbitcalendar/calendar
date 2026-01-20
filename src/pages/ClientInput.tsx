@@ -100,7 +100,7 @@ export const ClientInput = () => {
                 <input
                   type="text"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   value={formData.title}
                   onChange={e => setFormData({...formData, title: e.target.value})}
                 />
@@ -110,7 +110,7 @@ export const ClientInput = () => {
                 <input
                   type="date"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   value={formData.date}
                   onChange={e => setFormData({...formData, date: e.target.value})}
                 />
@@ -118,7 +118,7 @@ export const ClientInput = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   value={formData.type}
                   onChange={e => setFormData({...formData, type: e.target.value as any})}
                 >
@@ -132,7 +132,7 @@ export const ClientInput = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
                 />
@@ -148,7 +148,7 @@ export const ClientInput = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors cursor-pointer"
               >
                 Save Event
               </button>
@@ -173,12 +173,12 @@ export const ClientInput = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {/* Inline Add Row */}
-              <tr className="bg-indigo-50/30">
+              <tr className="bg-primary-50/30">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <input
                     type="text"
                     placeholder="New Event Title"
-                    className="w-full px-2 py-1 border-b border-transparent focus:border-indigo-500 bg-transparent focus:outline-none text-sm"
+                    className="w-full px-2 py-1 border-b border-transparent focus:border-primary-500 bg-transparent focus:outline-none text-sm"
                     value={newEventData.title}
                     onChange={e => setNewEventData({...newEventData, title: e.target.value})}
                   />
@@ -186,14 +186,14 @@ export const ClientInput = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <input
                     type="date"
-                    className="w-full px-2 py-1 border-b border-transparent focus:border-indigo-500 bg-transparent focus:outline-none text-sm text-gray-500"
+                    className="w-full px-2 py-1 border-b border-transparent focus:border-primary-500 bg-transparent focus:outline-none text-sm text-gray-500"
                     value={newEventData.date}
                     onChange={e => setNewEventData({...newEventData, date: e.target.value})}
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <select
-                    className="w-full px-2 py-1 border-b border-transparent focus:border-indigo-500 bg-transparent focus:outline-none text-sm text-gray-500"
+                    className="w-full px-2 py-1 border-b border-transparent focus:border-primary-500 bg-transparent focus:outline-none text-sm text-gray-500"
                     value={newEventData.type}
                     onChange={e => setNewEventData({...newEventData, type: e.target.value as any})}
                   >
@@ -207,7 +207,7 @@ export const ClientInput = () => {
                   <input
                     type="text"
                     placeholder="Description (optional)"
-                    className="w-full px-2 py-1 border-b border-transparent focus:border-indigo-500 bg-transparent focus:outline-none text-sm"
+                    className="w-full px-2 py-1 border-b border-transparent focus:border-primary-500 bg-transparent focus:outline-none text-sm"
                     value={newEventData.description}
                     onChange={e => setNewEventData({...newEventData, description: e.target.value})}
                   />
@@ -218,7 +218,7 @@ export const ClientInput = () => {
                     disabled={!newEventData.title || !newEventData.date}
                     className={`p-1 rounded-full transition-colors inline-flex items-center justify-center ${
                       newEventData.title && newEventData.date 
-                        ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                        ? 'bg-primary-600 text-white hover:bg-primary-700' 
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                   >
@@ -259,7 +259,7 @@ export const ClientInput = () => {
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => handleEdit(event)}
-                          className="text-indigo-600 hover:text-indigo-900 transition-colors cursor-pointer"
+                          className="text-primary-600 hover:text-primary-900 transition-colors cursor-pointer"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -281,24 +281,24 @@ export const ClientInput = () => {
         {/* Mobile Card View */}
         <div className="md:hidden divide-y divide-gray-200">
           {/* Inline Add Card */}
-          <div className="p-4 bg-indigo-50/30 space-y-3">
+          <div className="p-4 bg-primary-50/30 space-y-3">
             <div className="flex flex-col gap-3">
               <input
                 type="text"
                 placeholder="New Event Title"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                 value={newEventData.title}
                 onChange={e => setNewEventData({...newEventData, title: e.target.value})}
               />
               <div className="flex gap-2">
                 <input
                   type="date"
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                   value={newEventData.date}
                   onChange={e => setNewEventData({...newEventData, date: e.target.value})}
                 />
                 <select
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                   value={newEventData.type}
                   onChange={e => setNewEventData({...newEventData, type: e.target.value as any})}
                 >
@@ -312,7 +312,7 @@ export const ClientInput = () => {
                 <input
                   type="text"
                   placeholder="Description (optional)"
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                   value={newEventData.description}
                   onChange={e => setNewEventData({...newEventData, description: e.target.value})}
                 />
@@ -321,7 +321,7 @@ export const ClientInput = () => {
                   disabled={!newEventData.title || !newEventData.date}
                   className={`px-4 py-2 rounded-lg transition-colors flex items-center justify-center ${
                     newEventData.title && newEventData.date 
-                      ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                      ? 'bg-primary-600 text-white hover:bg-primary-700' 
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                 >
@@ -360,7 +360,7 @@ export const ClientInput = () => {
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     onClick={() => handleEdit(event)}
-                    className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-900 transition-colors cursor-pointer"
+                    className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-900 transition-colors cursor-pointer"
                   >
                     <Edit2 className="w-4 h-4" />
                     Edit

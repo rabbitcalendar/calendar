@@ -12,6 +12,7 @@ create table public.clients (
   username text not null unique,
   password text not null, -- Note: In a real app, use Supabase Auth instead of storing passwords
   role text not null check (role in ('agency', 'client')),
+  theme_color text default 'indigo',
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

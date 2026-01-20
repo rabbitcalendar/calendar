@@ -24,14 +24,14 @@ const ListDayRow = ({ day, events, posts, onAddPost, onEditPost, onEditEvent }: 
       ref={setNodeRef}
       className={`flex gap-4 p-4 rounded-lg border shadow-sm transition-colors ${
         isOver 
-          ? 'bg-indigo-50 border-indigo-200 ring-2 ring-indigo-200 ring-inset' 
+          ? 'bg-primary-50 border-primary-200 ring-2 ring-primary-200 ring-inset' 
           : 'bg-white border-gray-100'
       }`}
     >
       {/* Date Column */}
       <div className="w-24 flex-shrink-0 flex flex-col items-center justify-start pt-1">
         <span className="text-sm font-semibold text-gray-500 uppercase">{format(day, 'EEE')}</span>
-        <span className={`text-2xl font-bold ${isSameDay(day, new Date()) ? 'text-indigo-600' : 'text-gray-900'}`}>
+        <span className={`text-2xl font-bold ${isSameDay(day, new Date()) ? 'text-primary-600' : 'text-gray-900'}`}>
           {format(day, 'd')}
         </span>
       </div>
@@ -60,7 +60,7 @@ const ListDayRow = ({ day, events, posts, onAddPost, onEditPost, onEditEvent }: 
           ))}
           <button 
             onClick={() => onAddPost(day)}
-            className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all text-sm font-medium h-full min-h-[60px]"
+            className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all text-sm font-medium h-full min-h-[60px]"
           >
             <Plus className="w-4 h-4" />
             Add Post

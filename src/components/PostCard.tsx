@@ -57,7 +57,7 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
       onClick={onClick}
       className={`
         bg-white p-2 rounded shadow-sm border border-gray-200 text-xs 
-        ${isOverlay ? 'cursor-grabbing shadow-xl ring-2 ring-indigo-500 pointer-events-none' : 'cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow'} 
+        ${isOverlay ? 'cursor-grabbing shadow-xl ring-2 ring-primary-500 pointer-events-none' : 'cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow'} 
         group relative ${getStatusColor(post.status)}
       `}
     >

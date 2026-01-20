@@ -7,16 +7,19 @@ import {
   Menu, 
   X,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Settings
 } from 'lucide-react';
 import { useCalendar } from '../context/CalendarContext';
 import ClientManager from './ClientManager';
+import { ProfileSettings } from './ProfileSettings';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { clients, currentClient, setCurrentClient, user, logout } = useCalendar();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isClientMenuOpen, setIsClientMenuOpen] = useState(false);
   const [isClientManagerOpen, setIsClientManagerOpen] = useState(false);
+  const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false);
   const location = useLocation();
 
   // Connection status check (simple version)
@@ -40,7 +43,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-2 text-indigo-600">
+        <div className="flex items-center gap-2 text-primary-600">
           <LayoutDashboard className="w-6 h-6" />
           <span className="font-bold truncate max-w-[200px]">{displayClientName}</span>
         </div>
@@ -73,7 +76,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               onClick={() => setIsClientMenuOpen(!isClientMenuOpen)}
               className="w-full h-16 flex items-center justify-between px-4 hover:bg-gray-50 transition-colors"
             >
-              <div className="flex items-center gap-2 text-indigo-600">
+              <div className="flex items-center gap-2 text-primary-600">
                 <LayoutDashboard className="w-8 h-8" />
                 <span className="text-lg font-bold text-gray-900 truncate max-w-[140px]">{displayClientName}</span>
               </div>
@@ -90,12 +93,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       setIsClientMenuOpen(false);
                     }}
                     className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between group ${
-                      currentClient?.id === client.id ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700'
+                      currentClient?.id === client.id ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
                     }`}
                   >
                     <span className="font-medium">{client.name}</span>
                     {client.role === 'agency' && (
-                      <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Agency</span>
+                      <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">Agency</span>
                     )}
                   </button>
                 ))}
@@ -105,7 +108,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         ) : (
           /* Static Header for Clients */
           <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 hidden md:flex">
-            <div className="flex items-center gap-2 text-indigo-600">
+            <div className="flex items-center gap-2 text-primary-600">
               <LayoutDashboard className="w-8 h-8" />
               <span className="text-lg font-bold text-gray-900">{displayClientName}</span>
             </div>
@@ -122,7 +125,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
               <button
                 onClick={() => setIsClientManagerOpen(true)}
-                className="w-full flex items-center gap-3 px-3 py-2 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                className="w-full flex items-center gap-3 px-3 py-2 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-primary-600 transition-colors"
               >
                 <Users className="w-5 h-5" />
                 <span className="font-medium">Manage Clients</span>
@@ -137,8 +140,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             to="/client"
             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
               isActive('/client')
-                ? 'bg-indigo-50 text-indigo-600'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600'
+                ? 'bg-primary-50 text-primary-600'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
             }`}
           >
             <Users className="w-5 h-5" />
@@ -148,8 +151,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             to="/planner"
             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
               isActive('/planner') 
-                ? 'bg-indigo-50 text-indigo-600' 
-                : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600'
+                ? 'bg-primary-50 text-primary-600' 
+                : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
             }`}
           >
             <Calendar className="w-5 h-5" />
@@ -165,13 +168,22 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
              <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
            </div>
            
-           <button
-              onClick={logout}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
-            </button>
+           <div className="space-y-1">
+             <button
+                onClick={() => setIsProfileSettingsOpen(true)}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                <span>Settings</span>
+              </button>
+             <button
+                onClick={logout}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
+           </div>
         </div>
 
         {/* Status Indicator */}
@@ -206,6 +218,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </div>
       )}
+
+      {/* Profile Settings Modal */}
+      <ProfileSettings 
+        isOpen={isProfileSettingsOpen} 
+        onClose={() => setIsProfileSettingsOpen(false)} 
+      />
     </div>
   );
 };

@@ -4,6 +4,7 @@ export interface Client {
   username: string;
   password: string;
   role: 'agency' | 'client';
+  themeColor?: string; // 'indigo' | 'rose' | 'orange' | 'emerald' | 'violet' | 'cyan'
 }
 
 export interface CalendarEvent {
