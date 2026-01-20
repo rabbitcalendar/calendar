@@ -46,6 +46,8 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
     }
   };
 
+  const coverImage = post.images?.[0] || post.imageUrl;
+
   return (
     <div
       ref={setNodeRef}
@@ -59,6 +61,17 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
         group relative ${getStatusColor(post.status)}
       `}
     >
+      {coverImage && (
+        <div className="mb-2 -mx-2 -mt-2 rounded-t overflow-hidden aspect-video relative bg-gray-100">
+           <img src={coverImage} alt="" className="w-full h-full object-cover" />
+           {post.images && post.images.length > 1 && (
+             <div className="absolute bottom-1 right-1 bg-black/50 text-white text-[10px] px-1 rounded flex items-center gap-0.5">
+               <Layers className="w-3 h-3" />
+               {post.images.length}
+             </div>
+           )}
+        </div>
+      )}
       <div className="flex justify-between items-start gap-1 mb-1">
         <div className="font-semibold text-gray-700 truncate flex-1">{post.title}</div>
         <div className="text-gray-400">{getPlatformIcon(post.platform)}</div>

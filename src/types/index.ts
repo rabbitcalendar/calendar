@@ -24,5 +24,6 @@ export interface SocialPost {
   title: string;
   brief: string;
   status: 'draft' | 'approved' | 'scheduled' | 'published';
-  imageUrl?: string;
+  imageUrl?: string; // Deprecated, use images instead
+  images?: string[];
 }

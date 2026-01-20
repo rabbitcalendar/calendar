@@ -27,7 +27,7 @@ import {
   addMonths, 
   addWeeks, 
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Plus, X, LayoutGrid, Columns, List, LayoutList } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, LayoutGrid, Columns, List, LayoutList, Trash2, Eye, Maximize2 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { compressImage } from '../utils/compressImage';
 
@@ -159,6 +159,7 @@ export const AgencyPlanner = () => {
   const [editingEvent, setEditingEvent] = useState<Partial<CalendarEvent>>({});
   const [isUnscheduledOpen, setIsUnscheduledOpen] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Force expand sidebar when dragging
   useEffect(() => {
@@ -166,6 +167,27 @@ export const AgencyPlanner = () => {
       setIsUnscheduledOpen(true);
     }
   }, [activeId]);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (lightboxIndex === null || !editingPost.images) return;
+      
+      if (e.key === 'ArrowLeft') {
+        setLightboxIndex(prev => (prev !== null && prev > 0 ? prev - 1 : (editingPost.images?.length || 1) - 1));
+      } else if (e.key === 'ArrowRight') {
+        setLightboxIndex(prev => (prev !== null && prev < (editingPost.images?.length || 1) - 1 ? prev + 1 : 0));
+      } else if (e.key === 'Escape') {
+        setLightboxIndex(null);
+      }
+    };
+
+    if (lightboxIndex !== null) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, editingPost.images]);
 
   // Auto-collapse unscheduled sidebar on mobile - REMOVED to keep it open by default
   // useEffect(() => {
@@ -244,13 +266,17 @@ export const AgencyPlanner = () => {
       contentType: 'image',
       date: date ? format(date, 'yyyy-MM-dd') : null,
       title: '',
-      brief: ''
+      brief: '',
+      images: []
     });
     setIsModalOpen(true);
   };
 
   const handleEditPost = (post: SocialPost) => {
-    setEditingPost(post);
+    setEditingPost({
+      ...post,
+      images: post.images || (post.imageUrl ? [post.imageUrl] : [])
+    });
     setIsModalOpen(true);
   };
 
@@ -311,7 +337,8 @@ export const AgencyPlanner = () => {
       
       setEditingPost(prev => ({
         ...prev,
-        imageUrl: data.publicUrl
+        images: [...(prev.images || []), data.publicUrl],
+        imageUrl: data.publicUrl // Keep for compatibility
       }));
     } catch (error: any) {
       console.error('Error uploading image:', error.message);
@@ -322,6 +349,35 @@ export const AgencyPlanner = () => {
       }
     } finally {
       setIsUploading(false);
+      e.target.value = ''; // Reset input
+    }
+  };
+
+  const handleDeleteImage = async (index: number) => {
+    const imageToDelete = editingPost.images?.[index];
+    if (!imageToDelete) return;
+
+    // Optimistically remove from UI
+    const newImages = [...(editingPost.images || [])];
+    newImages.splice(index, 1);
+    
+    setEditingPost(prev => ({
+      ...prev,
+      images: newImages,
+      imageUrl: newImages.length > 0 ? newImages[newImages.length - 1] : undefined
+    }));
+
+    // Attempt to delete from Supabase
+    try {
+        if (isSupabaseConfigured && supabase) {
+            const pathParts = imageToDelete.split('/uploads/');
+            if (pathParts.length > 1) {
+                const filePath = pathParts[1];
+                await supabase.storage.from('uploads').remove([filePath]);
+            }
+        }
+    } catch (err) {
+        console.error("Error deleting file from storage:", err);
     }
   };
 
@@ -621,7 +677,7 @@ export const AgencyPlanner = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Images</label>
                 <div className="space-y-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
                   {/* Upload Option */}
                   <div>
@@ -636,7 +692,7 @@ export const AgencyPlanner = () => {
                         file:rounded-full file:border-0
                         file:text-xs file:font-semibold
                         file:bg-indigo-50 file:text-indigo-700
-                        hover:file:bg-indigo-100 cursor-pointer"
+                        hover:file:bg-indigo-100 file:cursor-pointer cursor-pointer"
                     />
                     {isUploading && <p className="text-xs text-indigo-600 mt-1 animate-pulse">Uploading to Supabase...</p>}
                   </div>
@@ -649,20 +705,86 @@ export const AgencyPlanner = () => {
 
                   {/* URL Option */}
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Image URL</label>
-                    <input 
-                      type="url" 
-                      className="w-full px-3 py-2 border rounded-lg text-sm bg-white"
-                      placeholder="https://example.com/image.jpg"
-                      value={editingPost.imageUrl || ''}
-                      onChange={e => setEditingPost({...editingPost, imageUrl: e.target.value})}
-                    />
-                    {editingPost.imageUrl && (
-                      <div className="mt-2 relative aspect-video w-full rounded-lg overflow-hidden border border-gray-200">
-                        <img src={editingPost.imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                      </div>
-                    )}
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Add Image URL</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="url" 
+                        className="flex-1 px-3 py-2 border rounded-lg text-sm bg-white"
+                        placeholder="https://example.com/image.jpg"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const url = e.currentTarget.value;
+                            if (url) {
+                              setEditingPost(prev => ({
+                                ...prev,
+                                images: [...(prev.images || []), url],
+                                imageUrl: url
+                              }));
+                              e.currentTarget.value = '';
+                            }
+                          }
+                        }}
+                      />
+                      <button 
+                          type="button"
+                          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm hover:bg-gray-200 transition-colors cursor-pointer"
+                          onClick={(e) => {
+                            const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                          const url = input.value;
+                          if (url) {
+                            setEditingPost(prev => ({
+                              ...prev,
+                              images: [...(prev.images || []), url],
+                              imageUrl: url
+                            }));
+                            input.value = '';
+                          }
+                        }}
+                      >
+                        Add
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Image Grid */}
+                  {editingPost.images && editingPost.images.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mt-4">
+                      {editingPost.images.map((img, idx) => (
+                        <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 bg-white">
+                          <img src={img} alt={`Image ${idx + 1}`} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors opacity-0 group-hover:opacity-100">
+                            {/* Center View Button */}
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <button 
+                                  type="button"
+                                  onClick={() => setLightboxIndex(idx)}
+                                  className="p-2 bg-white/90 rounded-full hover:bg-white transition-all shadow-sm transform scale-90 group-hover:scale-100 pointer-events-auto cursor-pointer"
+                                  title="View Full"
+                                >
+                                  <Maximize2 className="w-5 h-5 text-gray-700" />
+                                </button>
+                            </div>
+
+                            {/* Bottom Right Delete Button */}
+                            <button
+                              type="button"
+                              onClick={(e) => { 
+                                e.stopPropagation(); 
+                                if(window.confirm('Are you sure you want to delete this image?')) {
+                                    handleDeleteImage(idx); 
+                                }
+                              }}
+                              className="absolute bottom-2 right-2 p-1.5 bg-red-500/90 rounded-full hover:bg-red-600 transition-colors shadow-sm cursor-pointer"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4 text-white" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <div>
@@ -766,6 +888,49 @@ export const AgencyPlanner = () => {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Lightbox */}
+      {lightboxIndex !== null && editingPost.images && (
+        <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setLightboxIndex(null)}>
+          <button className="absolute top-4 right-4 text-white/70 hover:text-white p-2 transition-colors" onClick={() => setLightboxIndex(null)}>
+            <X className="w-8 h-8" />
+          </button>
+          
+          <img 
+            src={editingPost.images[lightboxIndex]} 
+            className="max-w-full max-h-full object-contain shadow-2xl" 
+            onClick={(e) => e.stopPropagation()}
+            alt="Full view"
+          />
+
+          {/* Navigation */}
+          {editingPost.images.length > 1 && (
+              <>
+                  <button 
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 bg-black/20 hover:bg-black/40 rounded-full transition-all backdrop-blur-sm"
+                      onClick={(e) => {
+                          e.stopPropagation();
+                          setLightboxIndex(prev => (prev !== null && prev > 0 ? prev - 1 : (editingPost.images?.length || 1) - 1));
+                      }}
+                  >
+                      <ChevronLeft className="w-8 h-8" />
+                  </button>
+                  <button 
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 bg-black/20 hover:bg-black/40 rounded-full transition-all backdrop-blur-sm"
+                      onClick={(e) => {
+                          e.stopPropagation();
+                          setLightboxIndex(prev => (prev !== null && prev < (editingPost.images?.length || 1) - 1 ? prev + 1 : 0));
+                      }}
+                  >
+                      <ChevronRight className="w-8 h-8" />
+                  </button>
+              </>
+          )}
+          
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm font-medium bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
+            {lightboxIndex + 1} / {editingPost.images.length}
           </div>
         </div>
       )}
