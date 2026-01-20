@@ -175,10 +175,15 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithOAuth = async (provider: 'google' | 'apple') => {
     if (!supabase) return;
+    
+    // Determine redirect URL based on environment
+    // Use window.location.origin to dynamically handle localhost vs production
+    const redirectTo = `${window.location.origin}/`; 
+    
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: window.location.origin,
+        redirectTo,
       },
     });
   };
