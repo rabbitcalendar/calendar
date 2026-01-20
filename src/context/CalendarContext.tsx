@@ -318,31 +318,46 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   const addPost = async (post: SocialPost) => {
     const newPost = { ...post, clientId: currentClient?.id || '1' };
     setAllPosts([...allPosts, newPost]);
+    
     if (isSupabaseConfigured && supabase) {
-      const dbPost = {
-        ...newPost,
-        content_type: newPost.contentType,
-        image_url: newPost.imageUrl
-      };
-      delete (dbPost as any).contentType;
-      delete (dbPost as any).imageUrl;
-      
-      await supabase.from('posts').insert([dbPost]);
+      try {
+        const dbPost = {
+          ...newPost,
+          content_type: newPost.contentType,
+          image_url: newPost.imageUrl
+        };
+        delete (dbPost as any).contentType;
+        delete (dbPost as any).imageUrl;
+        
+        const { error } = await supabase.from('posts').insert([dbPost]);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error adding post to Supabase:', err);
+        // Revert local state or alert user
+        alert('Failed to save post to database. Please check console for details.');
+      }
     }
   };
 
   const updatePost = async (updatedPost: SocialPost) => {
     setAllPosts(allPosts.map((p) => (p.id === updatedPost.id ? updatedPost : p)));
+    
     if (isSupabaseConfigured && supabase) {
-      const dbPost = {
-        ...updatedPost,
-        content_type: updatedPost.contentType,
-        image_url: updatedPost.imageUrl
-      };
-      delete (dbPost as any).contentType;
-      delete (dbPost as any).imageUrl;
+      try {
+        const dbPost = {
+          ...updatedPost,
+          content_type: updatedPost.contentType,
+          image_url: updatedPost.imageUrl
+        };
+        delete (dbPost as any).contentType;
+        delete (dbPost as any).imageUrl;
 
-      await supabase.from('posts').update(dbPost).eq('id', updatedPost.id);
+        const { error } = await supabase.from('posts').update(dbPost).eq('id', updatedPost.id);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error updating post in Supabase:', err);
+        alert('Failed to update post in database. Please check console for details.');
+      }
     }
   };
 

@@ -37,6 +37,7 @@ create table public.posts (
   brief text,
   status text not null default 'draft',
   image_url text,
+  images text[],
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
