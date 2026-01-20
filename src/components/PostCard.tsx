@@ -39,24 +39,22 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
     }
   };
 
-  const getStatusRibbon = (status: string) => {
+  const getStatusBadge = (status: string) => {
     const config = {
-      approved: { bg: 'bg-green-500', text: 'APPROVED' },
-      scheduled: { bg: 'bg-blue-500', text: 'SCHEDULED' },
-      published: { bg: 'bg-gray-500', text: 'PUBLISHED' },
-      draft: { bg: 'bg-yellow-500', text: 'DRAFT' },
+      approved: { bg: 'bg-green-500', text: 'APPROVED', textClass: 'text-white' },
+      scheduled: { bg: 'bg-blue-500', text: 'SCHEDULED', textClass: 'text-white' },
+      published: { bg: 'bg-gray-500', text: 'PUBLISHED', textClass: 'text-white' },
+      draft: { bg: 'bg-yellow-400', text: 'DRAFT', textClass: 'text-yellow-900' },
     };
     const style = config[status as keyof typeof config] || config.draft;
 
     return (
-      <div className="absolute top-0 right-0 overflow-hidden w-20 h-20 pointer-events-none">
-        <div className={`
-          absolute top-[12px] -right-[22px] transform rotate-45 
-          w-[100px] text-center text-[9px] font-bold text-white tracking-wider py-1
-          shadow-sm ${style.bg} z-10
-        `}>
-          {style.text}
-        </div>
+      <div className={`
+        absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded
+        text-[9px] font-bold tracking-wider shadow-sm z-10 pointer-events-none
+        ${style.bg} ${style.textClass}
+      `}>
+        {style.text}
       </div>
     );
   };
@@ -76,7 +74,7 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
         group relative
       `}
     >
-      {getStatusRibbon(post.status)}
+      {getStatusBadge(post.status)}
       {coverImage && (
         <div className="mb-2 -mx-2 -mt-2 rounded-t overflow-hidden aspect-video relative bg-gray-100">
            <img 
