@@ -287,6 +287,21 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     // Initialize Auth
     const initAuth = async () => {
       try {
+        // Check if we have a hash in the URL (OAuth redirect)
+        // If we do, we want to wait for onAuthStateChange to fire instead of just checking getSession
+        // because getSession might not have parsed the hash yet.
+        const hasAuthHash = window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error_description'));
+        
+        if (hasAuthHash) {
+          // If we have an auth hash, we DON'T set isLoading(false) here.
+          // We let onAuthStateChange handle it.
+          // However, we should set a timeout just in case it fails.
+          setTimeout(() => {
+            if (mounted) setIsLoading(false);
+          }, 5000);
+          return;
+        }
+
         const { data: { session } } = await client.auth.getSession();
         if (session) {
           await loadUserFromSession(session);
@@ -294,7 +309,11 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       } catch (err) {
         console.error('Auth initialization error:', err);
       } finally {
-        if (mounted) setIsLoading(false);
+        // Only turn off loading if we didn't defer to the hash handler
+        const hasAuthHash = window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error_description'));
+        if (!hasAuthHash && mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -304,6 +323,8 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         await loadUserFromSession(session);
+        // Ensure loading is turned off after successful sign in
+        if (mounted) setIsLoading(false);
       } else if (event === 'SIGNED_OUT') {
         if (mounted) {
           setUser(null);
