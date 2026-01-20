@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCalendar } from '../context/CalendarContext';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, LayoutDashboard, Mail } from 'lucide-react';
@@ -11,8 +11,14 @@ const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const { login, signInWithOAuth, signUp } = useCalendar();
+  const { login, signInWithOAuth, signUp, user } = useCalendar();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
