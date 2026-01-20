@@ -27,7 +27,23 @@ import {
   addMonths, 
   addWeeks, 
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Plus, X, LayoutGrid, Columns, List, LayoutList, Trash2, Eye, Maximize2 } from 'lucide-react';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Plus, 
+  X, 
+  LayoutGrid, 
+  Columns, 
+  List, 
+  LayoutList, 
+  Trash2, 
+  Eye, 
+  Maximize2,
+  GripVertical,
+  Calendar as CalendarIcon,
+  Filter,
+  AlertCircle
+} from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { compressImage } from '../utils/compressImage';
 
@@ -705,7 +721,10 @@ export const AgencyPlanner = () => {
 
                   {/* URL Option */}
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Add Image URL</label>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Add Image URL</label>
+                    <p className="text-[10px] text-gray-400 mb-2">
+                      Paste direct image links (ending in .jpg, .png). Webpage links (like Pinterest) will not work.
+                    </p>
                     <div className="flex gap-2">
                       <input 
                         type="url" 
@@ -752,7 +771,20 @@ export const AgencyPlanner = () => {
                     <div className="grid grid-cols-3 gap-2 mt-4">
                       {editingPost.images.map((img, idx) => (
                         <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 bg-white">
-                          <img src={img} alt={`Image ${idx + 1}`} className="w-full h-full object-cover" />
+                          <img 
+                            src={img} 
+                            alt={`Image ${idx + 1}`} 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const fallback = e.currentTarget.parentElement?.querySelector('.image-fallback');
+                              if (fallback) fallback.classList.remove('hidden');
+                            }}
+                          />
+                          <div className="image-fallback hidden absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-400">
+                            <AlertCircle className="w-6 h-6 mb-1" />
+                            <span className="text-[10px] px-2 text-center">Invalid Image</span>
+                          </div>
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors opacity-0 group-hover:opacity-100">
                             {/* Center View Button */}
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

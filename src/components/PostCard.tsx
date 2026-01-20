@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core';
 import type { SocialPost } from '../types';
-import { Instagram, Facebook, MapPin, FileText, Film, Image as ImageIcon, Layers, Video, BookOpen, Sparkles } from 'lucide-react';
+import { Instagram, Facebook, MapPin, FileText, Film, Image as ImageIcon, Layers, Video, BookOpen, Sparkles, AlertCircle } from 'lucide-react';
 
 export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onClick?: () => void, isOverlay?: boolean }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -63,7 +63,18 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
     >
       {coverImage && (
         <div className="mb-2 -mx-2 -mt-2 rounded-t overflow-hidden aspect-video relative bg-gray-100">
-           <img src={coverImage} alt="" className="w-full h-full object-cover" />
+           <img 
+             src={coverImage} 
+             alt="" 
+             className="w-full h-full object-cover" 
+             onError={(e) => {
+               e.currentTarget.style.display = 'none';
+               e.currentTarget.parentElement?.querySelector('.image-fallback')?.classList.remove('hidden');
+             }}
+           />
+           <div className="image-fallback hidden absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-400">
+             <AlertCircle className="w-5 h-5" />
+           </div>
            {post.images && post.images.length > 1 && (
              <div className="absolute bottom-1 right-1 bg-black/50 text-white text-[10px] px-1 rounded flex items-center gap-0.5">
                <Layers className="w-3 h-3" />
