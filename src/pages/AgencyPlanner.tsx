@@ -781,20 +781,20 @@ export const AgencyPlanner = () => {
                             <AlertCircle className="w-6 h-6 mb-1" />
                             <span className="text-[10px] px-2 text-center">Invalid Image</span>
                           </div>
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors opacity-0 group-hover:opacity-100">
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100">
                             {/* Center View Button */}
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <button 
                                   type="button"
                                   onClick={() => setLightboxIndex(idx)}
-                                  className="p-2 bg-white/90 rounded-full hover:bg-white transition-all shadow-sm transform scale-90 group-hover:scale-100 pointer-events-auto cursor-pointer"
+                                  className="p-2 bg-white/90 rounded-full hover:bg-white transition-all shadow-sm transform scale-100 md:scale-90 md:group-hover:scale-100 pointer-events-auto cursor-pointer"
                                   title="View Full"
                                 >
                                   <Maximize2 className="w-5 h-5 text-gray-700" />
                                 </button>
                             </div>
 
-                            {/* Bottom Right Delete Button */}
+                            {/* Top Right Remove Button */}
                             <button
                               type="button"
                               onClick={(e) => { 
@@ -803,10 +803,10 @@ export const AgencyPlanner = () => {
                                     handleDeleteImage(idx); 
                                 }
                               }}
-                              className="absolute bottom-2 right-2 p-1.5 bg-red-500/90 rounded-full hover:bg-red-600 transition-colors shadow-sm cursor-pointer"
+                              className="absolute top-1 right-1 p-1 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm cursor-pointer"
                               title="Delete"
                             >
-                              <Trash2 className="w-4 h-4 text-white" />
+                              <X className="w-3 h-3 text-gray-600" />
                             </button>
                           </div>
                         </div>
@@ -921,16 +921,39 @@ export const AgencyPlanner = () => {
       )}
       {/* Lightbox */}
       {lightboxIndex !== null && editingPost.images && (
-        <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setLightboxIndex(null)}>
+        <div 
+            className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 animate-in fade-in duration-200" 
+            onClick={() => setLightboxIndex(null)}
+            onTouchStart={(e) => {
+                const touch = e.touches[0];
+                e.currentTarget.dataset.touchStartX = touch.clientX.toString();
+            }}
+            onTouchEnd={(e) => {
+                const touchStartX = parseFloat(e.currentTarget.dataset.touchStartX || '0');
+                const touchEndX = e.changedTouches[0].clientX;
+                const diff = touchStartX - touchEndX;
+                
+                if (Math.abs(diff) > 50) { // Minimum swipe distance
+                    if (diff > 0) {
+                        // Swipe Left -> Next Image
+                        setLightboxIndex(prev => (prev !== null && prev < (editingPost.images?.length || 1) - 1 ? prev + 1 : 0));
+                    } else {
+                        // Swipe Right -> Previous Image
+                        setLightboxIndex(prev => (prev !== null && prev > 0 ? prev - 1 : (editingPost.images?.length || 1) - 1));
+                    }
+                }
+            }}
+        >
           <button className="absolute top-4 right-4 text-white/70 hover:text-white p-2 transition-colors" onClick={() => setLightboxIndex(null)}>
             <X className="w-8 h-8" />
           </button>
           
           <img 
             src={editingPost.images[lightboxIndex]} 
-            className="max-w-full max-h-full object-contain shadow-2xl" 
+            className="max-w-full max-h-full object-contain shadow-2xl select-none" 
             onClick={(e) => e.stopPropagation()}
             alt="Full view"
+            draggable={false}
           />
 
           {/* Navigation */}
