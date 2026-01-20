@@ -36,7 +36,6 @@ import {
   Columns, 
   List, 
   LayoutList, 
-  Trash2, 
   Maximize2,
   AlertCircle
 } from 'lucide-react';
