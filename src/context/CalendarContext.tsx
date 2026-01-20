@@ -226,17 +226,15 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
       return;
     }
+    
+    let mounted = true;
     const client = supabase;
 
-    // Check initial session
-    client.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        setIsLoading(false);
-      }
-    });
-
-    const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+    // Helper to load user data
+    const loadUserFromSession = async (session: any) => {
+      if (!session?.user) return;
+      
+      try {
         // Check if user exists in our clients table
         const { data: existingClient } = await client
           .from('clients')
@@ -245,9 +243,11 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
           .single();
 
         if (existingClient) {
-          const client: Client = { ...existingClient, themeColor: existingClient.theme_color || 'indigo' };
-          setUser(client);
-          setCurrentClientState(client);
+          const clientData: Client = { ...existingClient, themeColor: existingClient.theme_color || 'indigo' };
+          if (mounted) {
+            setUser(clientData);
+            setCurrentClientState(clientData);
+          }
         } else {
           // New user -> Create Client record
           const newClient: Client = {
@@ -259,14 +259,15 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
             themeColor: 'indigo'
           };
 
-          // Optimistic update
-          setClients(prev => {
-             // Avoid duplicates
-             if (prev.some(c => c.id === newClient.id)) return prev;
-             return [...prev, newClient];
-          });
-          setUser(newClient);
-          setCurrentClientState(newClient);
+          if (mounted) {
+            // Optimistic update
+            setClients(prev => {
+               if (prev.some(c => c.id === newClient.id)) return prev;
+               return [...prev, newClient];
+            });
+            setUser(newClient);
+            setCurrentClientState(newClient);
+          }
 
           // Persist
           await client.from('clients').insert([{
@@ -278,17 +279,43 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
             theme_color: newClient.themeColor
           }]);
         }
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setCurrentClientState(null);
-        localStorage.removeItem('calendar_user');
-        localStorage.removeItem('calendar_current_client');
+      } catch (err) {
+        console.error('Error loading user:', err);
       }
-      
-      setIsLoading(false);
+    };
+
+    // Initialize Auth
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await client.auth.getSession();
+        if (session) {
+          await loadUserFromSession(session);
+        }
+      } catch (err) {
+        console.error('Auth initialization error:', err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+
+    initAuth();
+
+    // Listen for changes
+    const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        await loadUserFromSession(session);
+      } else if (event === 'SIGNED_OUT') {
+        if (mounted) {
+          setUser(null);
+          setCurrentClientState(null);
+          localStorage.removeItem('calendar_user');
+          localStorage.removeItem('calendar_current_client');
+        }
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
