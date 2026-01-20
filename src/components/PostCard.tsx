@@ -1,6 +1,8 @@
 import { useDraggable } from '@dnd-kit/core';
 import type { SocialPost } from '../types';
-import { Instagram, Facebook, MapPin, FileText, Film, Image as ImageIcon, Layers, Video, BookOpen, Sparkles, AlertCircle } from 'lucide-react';
+import { FileText, Film, Image as ImageIcon, Layers, AlertCircle } from 'lucide-react';
+import { SiInstagram, SiFacebook, SiTiktok, SiXiaohongshu, SiGooglemaps } from 'react-icons/si';
+import { FaLemon } from 'react-icons/fa';
 
 export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onClick?: () => void, isOverlay?: boolean }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -18,12 +20,12 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
 
   const getPlatformIcon = (platform: string) => {
     switch(platform) {
-      case 'instagram': return <Instagram className="w-3 h-3 text-pink-600" />;
-      case 'facebook': return <Facebook className="w-3 h-3 text-blue-600" />;
-      case 'tiktok': return <Video className="w-3 h-3 text-black" />;
-      case 'xiaohongshu': return <BookOpen className="w-3 h-3 text-red-500" />;
-      case 'lemon8': return <Sparkles className="w-3 h-3 text-yellow-500" />;
-      case 'google_maps': return <MapPin className="w-3 h-3 text-green-600" />;
+      case 'instagram': return <SiInstagram className="w-3 h-3 text-pink-600" />;
+      case 'facebook': return <SiFacebook className="w-3 h-3 text-blue-600" />;
+      case 'tiktok': return <SiTiktok className="w-3 h-3 text-black" />;
+      case 'xiaohongshu': return <SiXiaohongshu className="w-3 h-3 text-red-500" />;
+      case 'lemon8': return <FaLemon className="w-3 h-3 text-yellow-500" />;
+      case 'google_maps': return <SiGooglemaps className="w-3 h-3 text-green-600" />;
       default: return <FileText className="w-3 h-3" />;
     }
   };
