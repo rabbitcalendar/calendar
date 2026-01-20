@@ -14,6 +14,8 @@ interface CalendarContextType {
   
   // Auth
   login: (username: string, password: string) => Promise<boolean>;
+  signInWithOAuth: (provider: 'google' | 'apple') => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<{ error: any }>;
   logout: () => void;
   
   // Client Management
@@ -146,6 +148,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
 
   // Auth Functions
   const login = async (username: string, password: string): Promise<boolean> => {
+    // 1. Try Legacy/Local Login
     const foundUser = clients.find(c => c.username.toLowerCase() === username.toLowerCase() && c.password === password);
     if (foundUser) {
       setUser(foundUser);
@@ -154,7 +157,46 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       setCurrentClientState(foundUser);
       return true;
     }
+
+    // 2. Try Supabase Auth Login (if configured)
+    if (supabase) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password,
+      });
+      
+      if (!error && data.session) {
+        return true;
+      }
+    }
+
     return false;
+  };
+
+  const signInWithOAuth = async (provider: 'google' | 'apple') => {
+    if (!supabase) return;
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+  };
+
+  const signUp = async (email: string, password: string, name: string) => {
+    if (!supabase) return { error: { message: 'Supabase not configured' } };
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+        },
+      },
+    });
+
+    return { error };
   };
 
   const logout = () => {
@@ -162,7 +204,69 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     setCurrentClientState(null);
     localStorage.removeItem('calendar_user');
     localStorage.removeItem('calendar_current_client');
+    if (supabase) supabase.auth.signOut();
   };
+
+  // Sync Auth State
+  useEffect(() => {
+    if (!supabase) return;
+    const client = supabase;
+
+    const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Check if user exists in our clients table
+        const { data: existingClient } = await client
+          .from('clients')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (existingClient) {
+          const client: Client = { ...existingClient, themeColor: existingClient.theme_color || 'indigo' };
+          setUser(client);
+          setCurrentClientState(client);
+        } else {
+          // New user -> Create Client record
+          const newClient: Client = {
+            id: session.user.id,
+            name: session.user.user_metadata.full_name || session.user.email?.split('@')[0] || 'Client',
+            username: session.user.email || session.user.id,
+            password: 'oauth-managed',
+            role: 'client',
+            themeColor: 'indigo'
+          };
+
+          // Optimistic update
+          setClients(prev => {
+             // Avoid duplicates
+             if (prev.some(c => c.id === newClient.id)) return prev;
+             return [...prev, newClient];
+          });
+          setUser(newClient);
+          setCurrentClientState(newClient);
+
+          // Persist
+          await client.from('clients').insert([{
+            id: newClient.id,
+            name: newClient.name,
+            username: newClient.username,
+            password: newClient.password,
+            role: newClient.role,
+            theme_color: newClient.themeColor
+          }]);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setCurrentClientState(null);
+        localStorage.removeItem('calendar_user');
+        localStorage.removeItem('calendar_current_client');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Sync Logic
   useEffect(() => {
@@ -444,6 +548,8 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         currentClient,
         user,
         login,
+        signInWithOAuth,
+        signUp,
         logout,
         setCurrentClient,
         addClient,
