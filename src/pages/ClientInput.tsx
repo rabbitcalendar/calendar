@@ -380,6 +380,7 @@ export const ClientInput = () => {
           )}
         </div>
       </div>
+      </div>
     </PageTransition>
   );
 };

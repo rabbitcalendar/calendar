@@ -40,7 +40,11 @@ import {
   List, 
   LayoutList, 
   Maximize2,
-  AlertCircle
+  AlertCircle,
+  ChevronDown,
+  Trash2,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { compressImage } from '../utils/compressImage';
@@ -113,7 +117,7 @@ const UnscheduledSidebar = ({
         ) : (
           <button 
             onClick={() => setIsUnscheduledOpen(true)}
-            className="w-full h-full flex items-center justify-center md:justify-center text-gray-400 hover:text-primary-600 transition-colors gap-2"
+            className="w-full h-full flex items-center justify-center md:justify-center text-gray-400 hover:text-primary-600 transition-all duration-200 hover-lift gap-2"
             title="Open Unscheduled"
           >
             <LayoutList className="w-6 h-6" />
@@ -173,6 +177,7 @@ export const AgencyPlanner = () => {
   const [editingEvent, setEditingEvent] = useState<Partial<CalendarEvent>>({});
   const [isUnscheduledOpen, setIsUnscheduledOpen] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Force expand sidebar when dragging
@@ -319,15 +324,11 @@ export const AgencyPlanner = () => {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    
+  const uploadFile = async (file: File) => {
     if (!isSupabaseConfigured || !supabase) {
       alert("Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file.");
       return;
     }
-
-    const file = e.target.files[0];
 
     setIsUploading(true);
 
@@ -366,7 +367,31 @@ export const AgencyPlanner = () => {
       }
     } finally {
       setIsUploading(false);
-      e.target.value = ''; // Reset input
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    await uploadFile(e.target.files[0]);
+    e.target.value = ''; // Reset input
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      await uploadFile(e.dataTransfer.files[0]);
     }
   };
 
@@ -516,15 +541,15 @@ export const AgencyPlanner = () => {
                     const sgDateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Singapore"});
                     setCurrentDate(new Date(sgDateString));
                   }}
-                  className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors shadow-sm"
+                  className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-all duration-200 hover-lift shadow-sm"
                 >
                   Today
                 </button>
                 <div className="h-5 w-px bg-gray-200 mx-0.5"></div>
-                <button onClick={() => navigate('prev')} className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer">
+                <button onClick={() => navigate('prev')} className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer transition-all duration-200 hover-lift">
                   <ChevronLeft className="w-4 h-4 text-gray-600" />
                 </button>
-                <button onClick={() => navigate('next')} className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer">
+                <button onClick={() => navigate('next')} className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer transition-all duration-200 hover-lift">
                   <ChevronRight className="w-4 h-4 text-gray-600" />
                 </button>
               </div>
@@ -534,21 +559,21 @@ export const AgencyPlanner = () => {
               <div className="flex items-center bg-gray-100 rounded-lg p-1 w-full sm:w-auto justify-center">
                 <button
                   onClick={() => setView('month')}
-                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'month' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all duration-200 hover-lift flex justify-center ${view === 'month' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="Month View"
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setView('week')}
-                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'week' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all duration-200 hover-lift flex justify-center ${view === 'week' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="Week View"
                 >
                   <Columns className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setView('list')}
-                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all flex justify-center ${view === 'list' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex-1 sm:flex-none p-2 rounded-md transition-all duration-200 hover-lift flex justify-center ${view === 'list' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                   title="List View"
                 >
                   <List className="w-4 h-4" />
@@ -563,15 +588,15 @@ export const AgencyPlanner = () => {
                   const sgDateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Singapore"});
                   setCurrentDate(new Date(sgDateString));
                 }}
-                className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors shadow-sm"
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-all duration-200 hover-lift shadow-sm"
               >
                 Today
               </button>
               <div className="h-6 w-px bg-gray-200 mx-1"></div>
-              <button onClick={() => navigate('prev')} className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+              <button onClick={() => navigate('prev')} className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-all duration-200 hover-lift">
                 <ChevronLeft className="w-5 h-5 text-gray-600" />
               </button>
-              <button onClick={() => navigate('next')} className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+              <button onClick={() => navigate('next')} className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-all duration-200 hover-lift">
                 <ChevronRight className="w-5 h-5 text-gray-600" />
               </button>
             </div>
@@ -639,217 +664,243 @@ export const AgencyPlanner = () => {
       {/* Modal - Outside DndContext */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold">
-                {editingPost.id ? 'Edit Post' : 'New Post'}
-              </h3>
-              <button onClick={() => setIsModalOpen(false)} className="cursor-pointer"><X className="w-5 h-5 text-gray-500" /></button>
-            </div>
-            <form onSubmit={handleSavePost} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                <input 
-                  type="text" 
-                  className="w-full px-3 py-2 border rounded-lg"
-                  value={editingPost.title || ''}
-                  onChange={e => setEditingPost({...editingPost, title: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Platform</label>
-                  <select 
-                    className="w-full px-3 py-2 border rounded-lg"
-                    value={editingPost.platform || 'instagram'}
-                    onChange={e => setEditingPost({...editingPost, platform: e.target.value as any})}
-                  >
-                    <option value="instagram">Instagram</option>
-                    <option value="tiktok">TikTok</option>
-                    <option value="xiaohongshu">Xiaohongshu</option>
-                    <option value="facebook">Facebook</option>
-                    <option value="lemon8">Lemon8</option>
-                    <option value="google_maps">Google Maps</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <select 
-                    className="w-full px-3 py-2 border rounded-lg"
-                    value={editingPost.contentType || 'image'}
-                    onChange={e => setEditingPost({...editingPost, contentType: e.target.value as any})}
-                  >
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                    <option value="carousel">Carousel</option>
-                    <option value="text">Text</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select 
-                  className="w-full px-3 py-2 border rounded-lg"
-                  value={editingPost.status || 'draft'}
-                  onChange={e => setEditingPost({...editingPost, status: e.target.value as any})}
-                >
-                  <option value="draft">Draft</option>
-                  <option value="approved">Approved</option>
-                  <option value="scheduled">Scheduled</option>
-                  <option value="published">Published</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Images</label>
-                <div className="space-y-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                  {/* Upload Option */}
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Upload File</label>
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      disabled={isUploading}
-                      className="block w-full text-sm text-gray-500
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-full file:border-0
-                        file:text-xs file:font-semibold
-                        file:bg-primary-50 file:text-primary-700
-                        hover:file:bg-primary-100 file:cursor-pointer cursor-pointer"
-                    />
-                    {isUploading && <p className="text-xs text-primary-600 mt-1 animate-pulse">Uploading to Supabase...</p>}
-                  </div>
-
-                  <div className="relative flex items-center py-2">
-                    <div className="flex-grow border-t border-gray-200"></div>
-                    <span className="flex-shrink-0 mx-4 text-xs font-medium text-gray-400">OR PASTE URL</span>
-                    <div className="flex-grow border-t border-gray-200"></div>
-                  </div>
-
-                  {/* URL Option */}
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Add Image URL</label>
-                    <p className="text-[10px] text-gray-400 mb-2">
-                      Paste direct image links (ending in .jpg, .png). Webpage links (like Pinterest) will not work.
-                    </p>
-                    <div className="flex gap-2">
-                      <input 
-                        type="url" 
-                        className="flex-1 px-3 py-2 border rounded-lg text-sm bg-white"
-                        placeholder="https://example.com/image.jpg"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            const url = e.currentTarget.value;
-                            if (url) {
-                              setEditingPost(prev => ({
-                                ...prev,
-                                images: [...(prev.images || []), url],
-                                imageUrl: url
-                              }));
-                              e.currentTarget.value = '';
-                            }
-                          }
-                        }}
-                      />
-                      <button 
-                          type="button"
-                          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm hover:bg-gray-200 transition-colors cursor-pointer"
-                          onClick={(e) => {
-                            const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                          const url = input.value;
-                          if (url) {
-                            setEditingPost(prev => ({
-                              ...prev,
-                              images: [...(prev.images || []), url],
-                              imageUrl: url
-                            }));
-                            input.value = '';
-                          }
-                        }}
-                      >
-                        Add
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Image Grid */}
-                  {editingPost.images && editingPost.images.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-4">
-                      {editingPost.images.map((img, idx) => (
-                        <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 bg-white">
-                          <img 
-                            src={img} 
-                            alt={`Image ${idx + 1}`} 
-                            className="w-full h-full object-cover" 
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              const fallback = e.currentTarget.parentElement?.querySelector('.image-fallback');
-                              if (fallback) fallback.classList.remove('hidden');
-                            }}
-                          />
-                          <div className="image-fallback hidden absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-400">
-                            <AlertCircle className="w-6 h-6 mb-1" />
-                            <span className="text-[10px] px-2 text-center">Invalid Image</span>
-                          </div>
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100">
-                            {/* Center View Button */}
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <button 
-                                  type="button"
-                                  onClick={() => setLightboxIndex(idx)}
-                                  className="p-2 bg-white/90 rounded-full hover:bg-white transition-all shadow-sm transform scale-100 md:scale-90 md:group-hover:scale-100 pointer-events-auto cursor-pointer"
-                                  title="View Full"
-                                >
-                                  <Maximize2 className="w-5 h-5 text-gray-700" />
-                                </button>
-                            </div>
-
-                            {/* Top Right Remove Button */}
-                            <button
-                              type="button"
-                              onClick={(e) => { 
-                                e.stopPropagation(); 
-                                if(window.confirm('Are you sure you want to delete this image?')) {
-                                    handleDeleteImage(idx); 
-                                }
-                              }}
-                              className="absolute top-1 right-1 p-1 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm cursor-pointer"
-                              title="Delete"
-                            >
-                              <X className="w-3 h-3 text-gray-600" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+          <div className="bg-white rounded-xl w-full max-w-md md:max-w-6xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden transition-all">
+            <form onSubmit={handleSavePost} className="flex flex-col h-full">
+              {/* Header */}
+              <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 bg-white z-10 shrink-0">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-3">
+                  {editingPost.id ? 'Edit Post' : 'New Post'}
+                  {editingPost.status && (
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${
+                          editingPost.status === 'published' ? 'bg-gray-50 text-gray-600 border-gray-200' :
+                          editingPost.status === 'scheduled' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                          editingPost.status === 'approved' ? 'bg-green-50 text-green-600 border-green-100' :
+                          'bg-yellow-50 text-yellow-700 border-yellow-100'
+                      }`}>
+                          {editingPost.status.charAt(0).toUpperCase() + editingPost.status.slice(1)}
+                      </span>
                   )}
+                </h3>
+                <div className="flex items-center gap-2">
+                   {/* Desktop Actions */}
+                   <div className="hidden md:flex items-center gap-3 mr-4">
+                      <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium">Cancel</button>
+                      <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm text-sm font-medium">Save Post</button>
+                   </div>
+                   <button type="button" onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Brief / Details</label>
-                <textarea 
-                  className="w-full px-3 py-2 border rounded-lg h-24"
-                  value={editingPost.brief || ''}
-                  onChange={e => setEditingPost({...editingPost, brief: e.target.value})}
-                ></textarea>
-              </div>
-              <div className="flex justify-between pt-2">
-                {editingPost.id && (
-                  <button 
-                    type="button" 
-                    onClick={handleDeletePost}
-                    className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors"
-                  >
-                    Delete
-                  </button>
-                )}
-                <div className={editingPost.id ? '' : 'ml-auto'}>
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="mr-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer">Save Post</button>
-                </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto md:overflow-hidden bg-gray-50/50 flex flex-col md:flex-row">
+                  
+                  {/* LEFT COLUMN: Media (Pinterest Style) */}
+                  <div className="flex-none md:flex-1 p-6 md:overflow-y-auto border-b md:border-b-0 md:border-r border-gray-200 bg-gray-50/30">
+                      <div className="max-w-3xl mx-auto space-y-6">
+                          <div className="flex items-center justify-between">
+                              <label className="block text-sm font-bold text-gray-900">Visual Assets</label>
+                              <span className="text-xs font-medium text-gray-500 bg-white px-2 py-1 rounded-full border border-gray-200 shadow-sm">{editingPost.images?.length || 0} images</span>
+                          </div>
+                          
+                          {/* Upload Area */}
+                          <div className="bg-white p-4 rounded-xl border border-dashed border-gray-300 hover:border-primary-400 transition-colors group">
+                              <div className="space-y-4">
+                                  <div className="flex items-center justify-center w-full">
+                                      <label 
+                                          onDragOver={handleDragOver}
+                                          onDragLeave={handleDragLeave}
+                                          onDrop={handleDrop}
+                                          className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                                              isDragging 
+                                              ? 'border-primary-500 bg-primary-50' 
+                                              : 'border-gray-100 bg-gray-50/50 group-hover:bg-gray-50'
+                                          }`}
+                                      >
+                                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                              <div className="p-3 bg-white rounded-full shadow-sm mb-3 group-hover:scale-110 transition-transform">
+                                                  <Upload className={`w-5 h-5 ${isDragging ? 'text-primary-600' : 'text-primary-600'}`} />
+                                              </div>
+                                              <p className="mb-1 text-sm text-gray-600"><span className="font-semibold text-primary-600">Click to upload</span> or drag and drop</p>
+                                              <p className="text-xs text-gray-400">SVG, PNG, JPG or GIF (Auto-optimized)</p>
+                                          </div>
+                                          <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} disabled={isUploading} />
+                                      </label>
+                                  </div>
+                                  
+                                  <div className="relative flex items-center py-2">
+                                      <div className="flex-grow border-t border-gray-100"></div>
+                                      <span className="flex-shrink-0 mx-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Or via URL</span>
+                                      <div className="flex-grow border-t border-gray-100"></div>
+                                  </div>
+                                  
+                                  <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <ImageIcon className="h-4 w-4 text-gray-400" />
+                                        </div>
+                                        <input 
+                                            type="url" 
+                                            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none transition-shadow"
+                                            placeholder="Paste image URL..."
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                const url = e.currentTarget.value;
+                                                if (url) {
+                                                    setEditingPost(prev => ({
+                                                    ...prev,
+                                                    images: [...(prev.images || []), url],
+                                                    imageUrl: url
+                                                    }));
+                                                    e.currentTarget.value = '';
+                                                }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <button type="button" className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm" onClick={(e) => {
+                                        const input = e.currentTarget.previousElementSibling?.querySelector('input') as HTMLInputElement;
+                                        if (input && input.value) {
+                                            setEditingPost(prev => ({...prev, images: [...(prev.images || []), input.value], imageUrl: input.value}));
+                                            input.value = '';
+                                        }
+                                    }}>Add</button>
+                                  </div>
+                              </div>
+                          </div>
+
+                          {/* Pinterest Grid */}
+                          {editingPost.images && editingPost.images.length > 0 ? (
+                             <div className="columns-2 gap-4 space-y-4 pb-4">
+                                {editingPost.images.map((img, idx) => (
+                                   <div key={idx} className="break-inside-avoid relative group rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all bg-white border border-gray-100">
+                                      <img src={img} className="w-full h-auto object-cover" alt="" />
+                                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                                          <button type="button" onClick={() => setLightboxIndex(idx)} className="p-2.5 bg-white/90 rounded-full hover:scale-110 transition-transform shadow-lg cursor-pointer" title="View Fullscreen"><Maximize2 className="w-4 h-4 text-gray-900" /></button>
+                                          <button type="button" onClick={(e) => {e.stopPropagation(); if(confirm('Delete image?')) handleDeleteImage(idx);}} className="p-2.5 bg-white/90 rounded-full hover:scale-110 transition-transform shadow-lg hover:bg-red-50 hover:text-red-600 cursor-pointer" title="Delete Image"><Trash2 className="w-4 h-4" /></button>
+                                      </div>
+                                   </div>
+                                ))}
+                             </div>
+                          ) : (
+                              <div className="flex flex-col items-center justify-center py-16 text-gray-400 bg-white rounded-xl border border-dashed border-gray-200">
+                                  <div className="p-4 bg-gray-50 rounded-full mb-3">
+                                      <LayoutGrid className="w-8 h-8 text-gray-300" />
+                                  </div>
+                                  <p className="text-sm font-medium text-gray-500">No images added yet</p>
+                                  <p className="text-xs text-gray-400 mt-1">Upload or paste a URL to get started</p>
+                              </div>
+                          )}
+                      </div>
+                  </div>
+
+                  {/* RIGHT COLUMN: Details */}
+                  <div className="md:w-[400px] lg:w-[480px] flex-shrink-0 bg-white md:overflow-y-auto border-l border-gray-100 shadow-[0_0_40px_-10px_rgba(0,0,0,0.05)] z-10">
+                    <div className="p-6 space-y-8">
+                      {/* Title Section */}
+                      <div className="space-y-3">
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">Post Details</label>
+                          <input 
+                            type="text" 
+                            className="w-full px-0 py-2 border-0 border-b-2 border-gray-100 text-xl font-bold text-gray-900 placeholder-gray-300 focus:ring-0 focus:border-primary-500 transition-colors bg-transparent"
+                            placeholder="Add a title..."
+                            value={editingPost.title || ''}
+                            onChange={e => setEditingPost({...editingPost, title: e.target.value})}
+                            required
+                          />
+                      </div>
+                      
+                      {/* Metadata Grid */}
+                      <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Platform</label>
+                              <div className="relative">
+                                  <select 
+                                      className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none transition-all cursor-pointer hover:bg-gray-100"
+                                      value={editingPost.platform || 'instagram'}
+                                      onChange={e => setEditingPost({...editingPost, platform: e.target.value as any})}
+                                  >
+                                      <option value="instagram">Instagram</option>
+                                      <option value="tiktok">TikTok</option>
+                                      <option value="xiaohongshu">Xiaohongshu</option>
+                                      <option value="facebook">Facebook</option>
+                                      <option value="lemon8">Lemon8</option>
+                                      <option value="google_maps">Google Maps</option>
+                                  </select>
+                                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                              </div>
+                          </div>
+                          <div className="space-y-2">
+                              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</label>
+                              <div className="relative">
+                                  <select 
+                                      className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none transition-all cursor-pointer hover:bg-gray-100"
+                                      value={editingPost.status || 'draft'}
+                                      onChange={e => setEditingPost({...editingPost, status: e.target.value as any})}
+                                  >
+                                      <option value="draft">Draft</option>
+                                      <option value="approved">Approved</option>
+                                      <option value="scheduled">Scheduled</option>
+                                      <option value="published">Published</option>
+                                  </select>
+                                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                              </div>
+                          </div>
+                      </div>
+
+                      {/* Content Type */}
+                       <div className="space-y-2">
+                          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Content Type</label>
+                           <div className="flex p-1 bg-gray-100/80 rounded-lg">
+                              {['image', 'video', 'carousel', 'text'].map(type => (
+                                  <button
+                                      key={type}
+                                      type="button"
+                                      onClick={() => setEditingPost({...editingPost, contentType: type as any})}
+                                      className={`flex-1 py-2 text-xs font-bold rounded-md capitalize transition-all duration-200 ${
+                                          editingPost.contentType === type 
+                                          ? 'bg-white text-primary-600 shadow-sm' 
+                                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                                      }`}
+                                  >
+                                      {type}
+                                  </button>
+                              ))}
+                           </div>
+                       </div>
+
+                      {/* Brief */}
+                      <div className="space-y-2">
+                          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Caption / Brief</label>
+                          <textarea 
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl min-h-[180px] focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none transition-all text-sm leading-relaxed resize-y bg-gray-50/50 focus:bg-white"
+                            placeholder="Write your caption here..."
+                            value={editingPost.brief || ''}
+                            onChange={e => setEditingPost({...editingPost, brief: e.target.value})}
+                          ></textarea>
+                      </div>
+
+                      {/* Footer Actions (Mobile/Desktop consistent) */}
+                       {editingPost.id && (
+                        <div className="pt-6 border-t border-gray-100 mt-auto">
+                          <button 
+                            type="button" 
+                            onClick={handleDeletePost}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl cursor-pointer transition-colors text-sm font-bold"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete Post
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Mobile Only Save Buttons */}
+                      <div className="md:hidden pt-4 flex gap-3">
+                          <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 rounded-xl font-bold">Cancel</button>
+                          <button type="submit" className="flex-1 px-4 py-3 bg-primary-600 text-white rounded-xl font-bold shadow-lg shadow-primary-600/20">Save</button>
+                      </div>
+                    </div>
+                  </div>
               </div>
             </form>
           </div>
