@@ -6,6 +6,9 @@ import { AgencyPlanner } from './pages/AgencyPlanner';
 import Login from './pages/Login';
 import { CalendarProvider, useCalendar } from './context/CalendarContext';
 
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsOfService } from './pages/TermsOfService';
+
 // Protected Route Component
 const PrivateRoute = ({ children }: { children: ReactElement }) => {
   const { user, isLoading } = useCalendar();
@@ -56,6 +59,9 @@ function App() {
               </Layout>
             </PrivateRoute>
           } />
+
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
 
           {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
