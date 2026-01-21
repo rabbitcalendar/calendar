@@ -7,7 +7,8 @@ import {
   X,
   LogOut,
   ChevronDown,
-  Settings
+  Settings,
+  Calendar
 } from 'lucide-react';
 import { useCalendar } from '../context/CalendarContext';
 import ClientManager from './ClientManager';
@@ -154,8 +155,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
             }`}
           >
-            <img src="/calendar/calendar.gif" alt="Calendar" className="w-5 h-5 object-contain" />
-            <span className="font-medium">Calendar</span>
+            <Calendar className="w-5 h-5" />
+            <span className="font-medium">Agency Planner</span>
           </Link>
         </nav>
 
