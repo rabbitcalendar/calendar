@@ -7,7 +7,7 @@ import Login from './pages/Login';
 import { CalendarProvider, useCalendar } from './context/CalendarContext';
 
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
-import { TermsOfService } from './pages/TermsOfService';
+import { Terms } from './pages/Terms';
 
 // Protected Route Component
 const PrivateRoute = ({ children }: { children: ReactElement }) => {
