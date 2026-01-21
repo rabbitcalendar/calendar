@@ -40,7 +40,6 @@ import {
   List, 
   LayoutList, 
   Maximize2,
-  AlertCircle,
   ChevronDown,
   Trash2,
   Upload,
@@ -663,11 +662,11 @@ export const AgencyPlanner = () => {
 
       {/* Modal - Outside DndContext */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md md:max-w-6xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden transition-all">
-            <form onSubmit={handleSavePost} className="flex flex-col h-full">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto md:overflow-hidden">
+          <div className="bg-white rounded-xl w-full max-w-md md:max-w-6xl shadow-2xl flex flex-col my-auto md:my-0 md:h-[90vh] transition-all relative">
+            <form onSubmit={handleSavePost} className="flex flex-col h-full max-h-full">
               {/* Header */}
-              <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 bg-white z-10 shrink-0">
+              <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 bg-white z-10 shrink-0 rounded-t-xl sticky top-0">
                 <h3 className="text-xl font-bold text-gray-900 flex items-center gap-3">
                   {editingPost.id ? 'Edit Post' : 'New Post'}
                   {editingPost.status && (
@@ -692,7 +691,7 @@ export const AgencyPlanner = () => {
               </div>
 
               {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto md:overflow-hidden bg-gray-50/50 flex flex-col md:flex-row">
+              <div className="flex-1 overflow-visible md:overflow-hidden bg-gray-50/50 flex flex-col md:flex-row">
                   
                   {/* LEFT COLUMN: Media (Pinterest Style) */}
                   <div className="flex-none md:flex-1 p-6 md:overflow-y-auto border-b md:border-b-0 md:border-r border-gray-200 bg-gray-50/30">
@@ -721,7 +720,7 @@ export const AgencyPlanner = () => {
                                                   <Upload className={`w-5 h-5 ${isDragging ? 'text-primary-600' : 'text-primary-600'}`} />
                                               </div>
                                               <p className="mb-1 text-sm text-gray-600"><span className="font-semibold text-primary-600">Click to upload</span> or drag and drop</p>
-                                              <p className="text-xs text-gray-400">SVG, PNG, JPG or GIF (Auto-optimized)</p>
+                                              <p className="text-xs text-gray-400">SVG, PNG, JPG or GIF</p>
                                           </div>
                                           <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} disabled={isUploading} />
                                       </label>
