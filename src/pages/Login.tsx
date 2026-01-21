@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useCalendar } from '../context/CalendarContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, User, LayoutDashboard, Mail } from 'lucide-react';
+import { Lock, User, Mail } from 'lucide-react';
+import { Logo } from '../components/Logo';
 import { FcGoogle } from 'react-icons/fc';
 
 const Login = () => {
@@ -66,7 +67,7 @@ const Login = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="mx-auto h-12 w-12 bg-primary-600 rounded-xl flex items-center justify-center">
-          <LayoutDashboard className="h-6 w-6 text-white" />
+          <Logo className="h-6 w-6 text-white" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {isSignUp ? 'Create your account' : 'Sign in to your calendar'}
@@ -83,7 +84,7 @@ const Login = () => {
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md animate-slide-up" style={{ animationDelay: '0.1s' }}>
         <div className="bg-white py-8 px-4 shadow rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {isSignUp && (

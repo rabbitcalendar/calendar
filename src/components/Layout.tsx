@@ -10,6 +10,7 @@ import {
   Settings,
   Calendar
 } from 'lucide-react';
+import { Logo } from './Logo';
 import { useCalendar } from '../context/CalendarContext';
 import ClientManager from './ClientManager';
 import { ProfileSettings } from './ProfileSettings';
@@ -44,7 +45,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-2 text-primary-600">
-          <LayoutDashboard className="w-6 h-6" />
+          <Logo className="w-6 h-6" />
           <span className="font-bold truncate max-w-[200px]">{displayClientName}</span>
         </div>
         <button 
@@ -74,13 +75,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="relative border-b border-gray-200 hidden md:block">
             <button
               onClick={() => setIsClientMenuOpen(!isClientMenuOpen)}
-              className="w-full h-16 flex items-center justify-between px-4 hover:bg-gray-50 transition-colors"
+              className="w-full h-16 flex items-center justify-between px-4 hover:bg-gray-50 transition-colors group"
             >
               <div className="flex items-center gap-2 text-primary-600">
-                <LayoutDashboard className="w-8 h-8" />
+                <div className="transition-transform duration-300 group-hover:scale-110">
+                  <Logo className="w-8 h-8" />
+                </div>
                 <span className="text-lg font-bold text-gray-900 truncate max-w-[140px]">{displayClientName}</span>
               </div>
-              <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isClientMenuOpen ? 'transform rotate-180' : ''}`} />
+              <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isClientMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isClientMenuOpen && (
@@ -107,9 +110,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </div>
         ) : (
           /* Static Header for Clients */
-          <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 hidden md:flex">
+          <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 hidden md:flex group cursor-default">
             <div className="flex items-center gap-2 text-primary-600">
-              <LayoutDashboard className="w-8 h-8" />
+              <div className="transition-transform duration-300 group-hover:scale-110">
+                <Logo className="w-8 h-8" />
+              </div>
               <span className="text-lg font-bold text-gray-900">{displayClientName}</span>
             </div>
           </div>
@@ -138,7 +143,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </div>
           <Link
             to="/client"
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 hover-lift ${
               isActive('/client')
                 ? 'bg-primary-50 text-primary-600'
                 : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
@@ -149,7 +154,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </Link>
           <Link
             to="/planner"
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 hover-lift ${
               isActive('/planner') 
                 ? 'bg-primary-50 text-primary-600' 
                 : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
