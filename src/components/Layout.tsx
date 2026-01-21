@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
-  Calendar, 
   Users, 
   LayoutDashboard, 
   Menu, 
@@ -155,8 +154,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
             }`}
           >
-            <Calendar className="w-5 h-5" />
-            <span className="font-medium">Agency Planner</span>
+            <img src="/calendar/calendar.gif" alt="Calendar" className="w-5 h-5 object-contain" />
+            <span className="font-medium">Calendar</span>
           </Link>
         </nav>
 
