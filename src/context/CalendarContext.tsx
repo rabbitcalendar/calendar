@@ -325,11 +325,10 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         if (existingClient) {
           // Check for soft delete
           if (existingClient.status === 'deleted') {
-            console.warn('User account is deleted');
+            console.warn('User is soft-deleted, logging out');
+            await client.auth.signOut();
             if (mounted) {
-              await client.auth.signOut();
               setUser(null);
-              setCurrentClientState(null);
               setIsLoading(false);
             }
             return;

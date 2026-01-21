@@ -85,7 +85,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {isClientMenuOpen && (
               <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg py-1 z-50 animate-in fade-in slide-in-from-top-2">
-                {clients.map(client => (
+                {clients.filter(c => c.status !== 'deleted').map(client => (
                   <button
                     key={client.id}
                     onClick={() => {
