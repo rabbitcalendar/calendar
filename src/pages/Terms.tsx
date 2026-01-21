@@ -1,67 +1,52 @@
+import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const Terms = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link to="/login" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Login
-        </Link>
-
-        <div className="bg-white shadow-sm rounded-2xl p-8 sm:p-12 border border-gray-100">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms</h1>
+      <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow">
+        <div className="mb-6">
+          <Link to="/" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back to Home
+          </Link>
+        </div>
+        
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms</h1>
+        
+        <div className="prose prose-indigo text-gray-600 space-y-6">
+          <p>Last updated: {new Date().toLocaleDateString()}</p>
           
-          <div className="prose prose-blue max-w-none text-gray-600 space-y-6">
-            <p className="lead">
-              Last updated: {new Date().toLocaleDateString()}
-            </p>
+          <h2 className="text-xl font-semibold text-gray-900">1. Acceptance of Terms</h2>
+          <p>
+            By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.
+          </p>
 
-            <h3>1. Introduction</h3>
-            <p>
-              Welcome to Rabbit Calendar ("we," "our," or "us"). By accessing or using our website and services, 
-              you agree to be bound by these Terms. If you disagree with any part of the terms, 
-              you may not access the service.
-            </p>
+          <h2 className="text-xl font-semibold text-gray-900">2. Description of Service</h2>
+          <p>
+            Rabbit Calendar provides users with access to a collection of resources, including various communications tools, search services, and personalized content which may be accessed through any medium or device now known or hereafter developed.
+          </p>
 
-            <h3>2. Description of Service</h3>
-            <p>
-              Rabbit Calendar provides a content calendar and social media planning tool for agencies and clients. 
-              We reserve the right to modify, suspend, or discontinue the service at any time.
-            </p>
+          <h2 className="text-xl font-semibold text-gray-900">3. User Account, Password, and Security</h2>
+          <p>
+            You are responsible for maintaining the confidentiality of your password and account, and are fully responsible for all activities that occur under your password or account. You agree to immediately notify Rabbit Calendar of any unauthorized use of your password or account or any other breach of security.
+          </p>
 
-            <h3>3. User Accounts</h3>
-            <p>
-              You are responsible for maintaining the confidentiality of your account and password. 
-              You agree to accept responsibility for all activities that occur under your account.
-            </p>
+          <h2 className="text-xl font-semibold text-gray-900">4. User Conduct</h2>
+          <p>
+            You understand that all information, data, text, software, music, sound, photographs, graphics, video, messages or other materials ("Content"), whether publicly posted or privately transmitted, are the sole responsibility of the person from which such Content originated. This means that you, and not Rabbit Calendar, are entirely responsible for all Content that you upload, post, email, transmit or otherwise make available via the Service.
+          </p>
 
-            <h3>4. Content and Conduct</h3>
-            <p>
-              You retain all rights to the content you post. However, you grant us a license to use, store, 
-              and display your content solely for the purpose of providing the service. You agree not to post 
-              content that is illegal, offensive, or violates the rights of others.
-            </p>
+          <h2 className="text-xl font-semibold text-gray-900">5. Termination</h2>
+          <p>
+            You agree that Rabbit Calendar may, under certain circumstances and without prior notice, immediately terminate your account and access to the Service. Cause for such termination shall include, but not be limited to, (a) breaches or violations of the TOS or other incorporated agreements or guidelines, (b) requests by law enforcement or other government agencies, (c) a request by you (self-initiated account deletions).
+          </p>
 
-            <h3>5. Limitation of Liability</h3>
-            <p>
-              In no event shall Rabbit Calendar be liable for any indirect, incidental, special, consequential 
-              or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other 
-              intangible losses.
-            </p>
-
-            <h3>6. Changes to Terms</h3>
-            <p>
-              We reserve the right to modify these terms at any time. We will notify users of any material changes. 
-              Your continued use of the service constitutes acceptance of the new terms.
-            </p>
-
-            <h3>7. Contact Us</h3>
-            <p>
-              If you have any questions about these Terms, please contact us at calendar@rabbit.com.sg.
-            </p>
-          </div>
+          <h2 className="text-xl font-semibold text-gray-900">6. Contact Information</h2>
+          <p>
+            Questions about the Terms of Service should be sent to us at: calendar@rabbit.com.sg
+          </p>
         </div>
       </div>
     </div>
