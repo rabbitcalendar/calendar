@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCalendar } from '../context/CalendarContext';
+import { PageTransition } from '../components/PageTransition';
 import type { CalendarEvent } from '../types';
 import { Plus, Trash2, Calendar as CalendarIcon, Edit2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -81,8 +82,9 @@ export const ClientInput = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <PageTransition>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Client Input Area</h2>
           <p className="text-gray-500">Manage upcoming events, promotions, and holidays.</p>
@@ -378,6 +380,6 @@ export const ClientInput = () => {
           )}
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };

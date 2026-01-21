@@ -70,7 +70,7 @@ export const PostCard = ({ post, onClick, isOverlay }: { post: SocialPost, onCli
       onClick={onClick}
       className={`
         bg-white p-2 rounded shadow-sm border border-gray-200 text-xs overflow-hidden
-        ${isOverlay ? 'cursor-grabbing shadow-xl ring-2 ring-primary-500 pointer-events-none' : 'cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow'} 
+        ${isOverlay ? 'cursor-grabbing shadow-2xl ring-2 ring-primary-500 rotate-3 scale-105 z-50' : 'cursor-grab active:cursor-grabbing hover:shadow-md hover:-translate-y-0.5 transition-all duration-200'} 
         group relative
       `}
     >

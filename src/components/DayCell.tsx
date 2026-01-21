@@ -34,9 +34,9 @@ export const DayCell = ({
     <div
       ref={setNodeRef}
       className={`
-        p-2 border border-gray-100 flex flex-col gap-2 transition-colors group
+        p-2 border border-gray-100 flex flex-col gap-2 transition-all duration-200 group
         ${isCurrentMonth ? 'bg-white' : 'bg-gray-50/50'} 
-        ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-200' : ''}
+        ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-300 shadow-inner scale-[1.02] z-10' : ''}
         ${variant === 'week' ? 'min-h-[300px]' : 'min-h-[120px]'}
       `}
     >

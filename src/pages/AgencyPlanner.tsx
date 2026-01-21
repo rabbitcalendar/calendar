@@ -15,6 +15,9 @@ import { useCalendar } from '../context/CalendarContext';
 import { PostCard } from '../components/PostCard';
 import { DayCell } from '../components/DayCell';
 import { ListView } from '../components/ListView';
+import { CalendarSkeleton } from '../components/CalendarSkeleton';
+import { PageTransition } from '../components/PageTransition';
+import { triggerCheckmarkConfetti } from '../utils/confetti';
 import type { SocialPost, CalendarEvent } from '../types';
 import { 
   format, 
@@ -160,7 +163,7 @@ const UnscheduledSidebar = ({
 };
 
 export const AgencyPlanner = () => {
-  const { events, posts, movePost, addPost, updatePost, deletePost, addEvent, updateEvent, deleteEvent } = useCalendar();
+  const { events, posts, movePost, addPost, updatePost, deletePost, addEvent, updateEvent, deleteEvent, isLoading } = useCalendar();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>('month');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -297,6 +300,9 @@ export const AgencyPlanner = () => {
 
     if (editingPost.id) {
       updatePost(editingPost as SocialPost);
+      if (editingPost.status === 'published' || editingPost.status === 'approved') {
+        triggerCheckmarkConfetti();
+      }
     } else {
       addPost({
         ...editingPost,
@@ -455,8 +461,16 @@ export const AgencyPlanner = () => {
     return rectIntersection(args);
   };
 
+  if (isLoading) {
+    return (
+      <div className="h-[calc(100vh-theme(spacing.24))] p-4 md:p-6">
+        <CalendarSkeleton />
+      </div>
+    );
+  }
+
   return (
-    <>
+    <PageTransition>
       <DndContext 
         sensors={sensors} 
         collisionDetection={customCollisionDetection}
@@ -984,6 +998,6 @@ export const AgencyPlanner = () => {
           </div>
         </div>
       )}
-    </>
+    </PageTransition>
   );
 };
