@@ -35,7 +35,7 @@ const Login = () => {
           // Auto-login successful (Email confirmation might be disabled)
           navigate('/');
         } else {
-          setMessage('Account created! Please check your email to confirm, or try logging in.');
+          setMessage('Account created successfully! We have sent a confirmation link to your email. Please verify your email address to log in.');
           setIsSignUp(false);
         }
       } else {
