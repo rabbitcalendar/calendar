@@ -152,6 +152,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     // 1. Try Legacy/Local Login
     const foundUser = clients.find(c => c.username.toLowerCase() === username.toLowerCase() && c.password === password);
     if (foundUser) {
+      if (foundUser.status === 'deleted') return false; // Prevent deleted users from logging in
       setUser(foundUser);
       // If agency, set to self (Rabbit) by default so they land on their own calendar
       // If client, set to self
@@ -167,6 +168,8 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (!error && data.session) {
+        // We need to check the status after successful auth
+        // The loadUserFromSession function will handle the check
         return true;
       }
     }
@@ -306,6 +309,15 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         const existingClient = result?.data;
 
         if (existingClient) {
+          if (existingClient.status === 'deleted') {
+             // If user is soft-deleted, sign them out immediately
+             await client.auth.signOut();
+             if (mounted) {
+                setUser(null);
+                setCurrentClientState(null);
+             }
+             return;
+          }
           const clientData: Client = { ...existingClient, themeColor: existingClient.theme_color || 'indigo' };
           if (mounted) {
             setUser(clientData);

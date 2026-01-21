@@ -1,27 +1,28 @@
-import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const TermsOfService = () => {
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow">
-        <div className="mb-6">
-          <Link to="/" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Home
-          </Link>
-        </div>
-        
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms of Service</h1>
-        
-        <div className="prose prose-indigo text-gray-600 space-y-6">
-          <p>Last updated: {new Date().toLocaleDateString()}</p>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <Link to="/login" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 mb-8 transition-colors">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Login
+        </Link>
+
+        <div className="bg-white shadow-sm rounded-2xl p-8 sm:p-12 border border-gray-100">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms</h1>
           
-          <h2 className="text-xl font-semibold text-gray-900">1. Acceptance of Terms</h2>
-          <p>
-            By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.
-          </p>
+          <div className="prose prose-blue max-w-none text-gray-600">
+            <p className="lead">
+              Last updated: {new Date().toLocaleDateString()}
+            </p>
+
+            <h3>1. Introduction</h3>
+            <p>
+              Welcome to Rabbit Calendar ("we," "our," or "us"). By accessing or using our website and services, 
+              you agree to be bound by these Terms. If you disagree with any part of the terms, 
+              you may not access the service.
+            </p>
 
           <h2 className="text-xl font-semibold text-gray-900">2. Description of Service</h2>
           <p>
