@@ -61,7 +61,7 @@ function App() {
           } />
 
           <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/terms" element={<Terms />} />
 
           {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
