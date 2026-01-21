@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -13,7 +12,7 @@ export const Terms = () => {
           </Link>
         </div>
         
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms of Service</h1>
         
         <div className="prose prose-indigo text-gray-600 space-y-6">
           <p>Last updated: {new Date().toLocaleDateString()}</p>
