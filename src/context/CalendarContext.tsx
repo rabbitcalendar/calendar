@@ -197,10 +197,17 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, name: string) => {
     if (!supabase) return { error: { message: 'Supabase not configured' } };
     
+    // Determine redirect URL based on environment (same as OAuth)
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const redirectTo = isLocal 
+      ? window.location.origin 
+      : `${window.location.origin}/calendar`;
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: redirectTo,
         data: {
           full_name: name,
         },
