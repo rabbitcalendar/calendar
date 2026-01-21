@@ -150,9 +150,12 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   // Auth Functions
   const login = async (username: string, password: string): Promise<boolean> => {
     // 1. Try Legacy/Local Login
-    const foundUser = clients.find(c => c.username.toLowerCase() === username.toLowerCase() && c.password === password);
+    const foundUser = clients.find(c => 
+      c.username.toLowerCase() === username.toLowerCase() && 
+      c.password === password &&
+      c.status !== 'deleted' // Check soft delete status
+    );
     if (foundUser) {
-      if (foundUser.status === 'deleted') return false; // Prevent deleted users from logging in
       setUser(foundUser);
       // If agency, set to self (Rabbit) by default so they land on their own calendar
       // If client, set to self
@@ -168,8 +171,19 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (!error && data.session) {
-        // We need to check the status after successful auth
-        // The loadUserFromSession function will handle the check
+        // Check if the user is soft-deleted in the clients table
+        const { data: clientData } = await supabase
+          .from('clients')
+          .select('status')
+          .eq('id', data.session.user.id)
+          .single();
+
+        if (clientData?.status === 'deleted') {
+          // Deny login for soft-deleted users
+          await supabase.auth.signOut();
+          return false;
+        }
+
         return true;
       }
     }
@@ -309,15 +323,18 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         const existingClient = result?.data;
 
         if (existingClient) {
+          // Check for soft delete
           if (existingClient.status === 'deleted') {
-             // If user is soft-deleted, sign them out immediately
-             await client.auth.signOut();
-             if (mounted) {
-                setUser(null);
-                setCurrentClientState(null);
-             }
-             return;
+            console.warn('User account is deleted');
+            if (mounted) {
+              await client.auth.signOut();
+              setUser(null);
+              setCurrentClientState(null);
+              setIsLoading(false);
+            }
+            return;
           }
+
           const clientData: Client = { ...existingClient, themeColor: existingClient.theme_color || 'indigo' };
           if (mounted) {
             setUser(clientData);
@@ -556,13 +573,11 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     // Prevent deleting self
     if (id === user.id) return;
 
-    setClients(clients.filter(c => c.id !== id));
-    
-    // Also cleanup events and posts for this client?
-    // Optional: setAllEvents(allEvents.filter(e => e.clientId !== id));
+    // Soft delete: update status instead of removing
+    setClients(clients.map(c => c.id === id ? { ...c, status: 'deleted' } : c));
     
     if (isSupabaseConfigured && supabase) {
-      await supabase.from('clients').delete().eq('id', id);
+      await supabase.from('clients').update({ status: 'deleted' }).eq('id', id);
     }
   };
 

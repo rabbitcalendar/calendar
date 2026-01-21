@@ -4,6 +4,9 @@ import { Plus, Trash2, Key, X } from 'lucide-react';
 
 const ClientManager = () => {
   const { clients, addClient, deleteClient, resetPassword } = useCalendar();
+  // Filter out deleted clients
+  const activeClients = clients.filter(client => client.status !== 'deleted');
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
@@ -67,7 +70,7 @@ const ClientManager = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {clients.map((client) => (
+            {activeClients.map((client) => (
               <tr key={client.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{client.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{client.username}</td>
