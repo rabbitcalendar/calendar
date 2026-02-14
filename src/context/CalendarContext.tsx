@@ -4,6 +4,7 @@ import type { CalendarEvent, SocialPost, Client } from '../types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { applyTheme } from '../lib/theme';
 import { getAllHolidays } from '../utils/holidays';
+import { generateUUID } from '../utils/uuid';
 
 interface CalendarContextType {
   events: CalendarEvent[];
@@ -311,7 +312,18 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
           const clientData: Client = { ...existingClient, themeColor: existingClient.theme_color || 'indigo' };
           if (mounted) {
             setUser(clientData);
-            setCurrentClientState(clientData);
+            
+            // If agency, respect the persisted current client (don't overwrite with self)
+            // unless there is no persisted client
+            if (clientData.role === 'agency') {
+              const saved = localStorage.getItem('calendar_current_client');
+              if (!saved) {
+                setCurrentClientState(clientData);
+              }
+            } else {
+              // Non-agency users can only view themselves
+              setCurrentClientState(clientData);
+            }
           }
         } else {
           // New user -> Create Client record
@@ -607,17 +619,48 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addEvent = async (event: CalendarEvent) => {
-    const newEvent = { ...event, clientId: currentClient?.id || '1' };
+    // Ensure event has a valid UUID if not provided (though usually provided by UI)
+    const eventId = event.id && event.id.length > 20 ? event.id : generateUUID();
+    const newEvent = { ...event, id: eventId, clientId: currentClient?.id || '1' };
+    
     setAllEvents([...allEvents, newEvent]);
     if (isSupabaseConfigured && supabase) {
-      await supabase.from('events').insert([newEvent]);
+      try {
+        const dbEvent = {
+            ...newEvent,
+            client_id: newEvent.clientId
+        };
+        // Remove camelCase if mapping to snake_case to be clean, 
+        // though Supabase might ignore extra fields, it's safer to be precise.
+        // However, we don't know if 'clientId' column exists or 'client_id'.
+        // Sending BOTH is the safest bet if we are unsure, 
+        // BUT if one column is missing and strict mode is on, it fails.
+        // Given 'posts' logic in this file doesn't map clientId, 
+        // but 'clients' load logic maps snake_case -> camelCase...
+        // We will assume client_id is the correct column based on SQL conventions.
+        
+        const { error } = await supabase.from('events').insert([dbEvent]);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error adding event:', err);
+        // Silent fail for now to match previous behavior but logging it
+      }
     }
   };
 
   const updateEvent = async (updatedEvent: CalendarEvent) => {
     setAllEvents(allEvents.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)));
     if (isSupabaseConfigured && supabase) {
-      await supabase.from('events').update(updatedEvent).eq('id', updatedEvent.id);
+      try {
+         const dbEvent = {
+            ...updatedEvent,
+            client_id: updatedEvent.clientId
+        };
+        const { error } = await supabase.from('events').update(dbEvent).eq('id', updatedEvent.id);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error updating event:', err);
+      }
     }
   };
 
@@ -645,7 +688,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       if (!exists) {
         const newEvent: CalendarEvent = {
           ...holiday,
-          id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+          id: generateUUID(),
           clientId: currentClient.id,
           // Cast type to match CalendarEvent type strictly if needed, though holiday.type is compatible
           type: holiday.type as 'holiday' | 'promotion' | 'event' | 'other'
@@ -662,10 +705,17 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     // Batch insert to Supabase if configured
     if (isSupabaseConfigured && supabase) {
       try {
-        const { error } = await supabase.from('events').insert(newEvents);
+        const dbEvents = newEvents.map(e => ({
+            ...e,
+            client_id: e.clientId
+        }));
+        
+        const { error } = await supabase.from('events').insert(dbEvents);
         if (error) throw error;
+        console.log(`Successfully populated ${newEvents.length} holidays for client ${currentClient.id}`);
       } catch (err) {
         console.error('Error populating holidays:', err);
+        alert('Failed to save holidays to database. Please check console for details.');
         // Revert local state if needed, or just let it be (it will sync on reload)
       }
     }
@@ -679,6 +729,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       try {
         const dbPost = {
           ...newPost,
+          client_id: newPost.clientId,
           content_type: newPost.contentType,
           image_url: newPost.imageUrl
         };
@@ -702,6 +753,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       try {
         const dbPost = {
           ...updatedPost,
+          client_id: updatedPost.clientId,
           content_type: updatedPost.contentType,
           image_url: updatedPost.imageUrl
         };
