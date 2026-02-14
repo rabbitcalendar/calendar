@@ -637,14 +637,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
             ...newEvent,
             client_id: newEvent.clientId
         };
-        // Remove camelCase if mapping to snake_case to be clean, 
-        // though Supabase might ignore extra fields, it's safer to be precise.
-        // However, we don't know if 'clientId' column exists or 'client_id'.
-        // Sending BOTH is the safest bet if we are unsure, 
-        // BUT if one column is missing and strict mode is on, it fails.
-        // Given 'posts' logic in this file doesn't map clientId, 
-        // but 'clients' load logic maps snake_case -> camelCase...
-        // We will assume client_id is the correct column based on SQL conventions.
+        delete (dbEvent as any).clientId;
         
         const { error } = await supabase.from('events').insert([dbEvent]);
         if (error) throw error;
@@ -663,6 +656,8 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
             ...updatedEvent,
             client_id: updatedEvent.clientId
         };
+        delete (dbEvent as any).clientId;
+
         const { error } = await supabase.from('events').update(dbEvent).eq('id', updatedEvent.id);
         if (error) throw error;
       } catch (err) {
@@ -712,10 +707,11 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     // Batch insert to Supabase if configured
     if (isSupabaseConfigured && supabase) {
       try {
-        const dbEvents = newEvents.map(e => ({
-            ...e,
-            client_id: e.clientId
-        }));
+        const dbEvents = newEvents.map(e => {
+            const dbE = { ...e, client_id: e.clientId };
+            delete (dbE as any).clientId;
+            return dbE;
+        });
         
         const { error } = await supabase.from('events').insert(dbEvents);
         if (error) throw error;
@@ -740,6 +736,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
           content_type: newPost.contentType,
           image_url: newPost.imageUrl
         };
+        delete (dbPost as any).clientId;
         delete (dbPost as any).contentType;
         delete (dbPost as any).imageUrl;
         
@@ -764,6 +761,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
           content_type: updatedPost.contentType,
           image_url: updatedPost.imageUrl
         };
+        delete (dbPost as any).clientId;
         delete (dbPost as any).contentType;
         delete (dbPost as any).imageUrl;
 
