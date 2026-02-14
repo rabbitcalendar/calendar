@@ -127,7 +127,8 @@ export const getAllHolidays = (year: number): HolidayBase[] => {
   // 1. Add Fixed Holidays
   FIXED_HOLIDAYS.forEach(h => {
     holidays.push({
-      ...h,
+      title: h.title,
+      description: h.description,
       date: format(new Date(year, h.month, h.day), 'yyyy-MM-dd'),
       type: h.type as any
     });
@@ -136,7 +137,8 @@ export const getAllHolidays = (year: number): HolidayBase[] => {
   // 2. Add Fixed Retail Events
   FIXED_RETAIL_EVENTS.forEach(h => {
     holidays.push({
-      ...h,
+      title: h.title,
+      description: h.description,
       date: format(new Date(year, h.month, h.day), 'yyyy-MM-dd'),
       type: h.type as any
     });
