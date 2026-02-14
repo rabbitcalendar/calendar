@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { CalendarEvent, SocialPost, Client } from '../types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { applyTheme } from '../lib/theme';
+import { getAllHolidays } from '../utils/holidays';
 
 interface CalendarContextType {
   events: CalendarEvent[];
@@ -35,6 +36,7 @@ interface CalendarContextType {
   deletePost: (id: string) => void;
   movePost: (id: string, newDate: string | null) => void;
   updateProjectName: (name: string) => void;
+  populateHolidays: (year: number) => Promise<void>;
 }
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined);
@@ -626,6 +628,49 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const populateHolidays = async (year: number) => {
+    if (!currentClient) return;
+    
+    const holidays = getAllHolidays(year);
+    const existingEvents = allEvents.filter(e => e.clientId === currentClient.id);
+    
+    const newEvents: CalendarEvent[] = [];
+    
+    for (const holiday of holidays) {
+      // Check if this holiday already exists for this client
+      const exists = existingEvents.some(e => 
+        e.date === holiday.date && e.title === holiday.title
+      );
+      
+      if (!exists) {
+        const newEvent: CalendarEvent = {
+          ...holiday,
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+          clientId: currentClient.id,
+          // Cast type to match CalendarEvent type strictly if needed, though holiday.type is compatible
+          type: holiday.type as 'holiday' | 'promotion' | 'event' | 'other'
+        };
+        newEvents.push(newEvent);
+      }
+    }
+    
+    if (newEvents.length === 0) return;
+    
+    // Optimistically update local state
+    setAllEvents(prev => [...prev, ...newEvents]);
+    
+    // Batch insert to Supabase if configured
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { error } = await supabase.from('events').insert(newEvents);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error populating holidays:', err);
+        // Revert local state if needed, or just let it be (it will sync on reload)
+      }
+    }
+  };
+
   const addPost = async (post: SocialPost) => {
     const newPost = { ...post, clientId: currentClient?.id || '1' };
     setAllPosts([...allPosts, newPost]);
@@ -720,6 +765,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         deletePost,
         movePost,
         updateProjectName,
+        populateHolidays,
       }}
     >
       {children}

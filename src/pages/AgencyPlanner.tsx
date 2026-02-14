@@ -43,7 +43,8 @@ import {
   ChevronDown,
   Trash2,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Sparkles
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { compressImage } from '../utils/compressImage';
@@ -166,7 +167,7 @@ const UnscheduledSidebar = ({
 };
 
 export const AgencyPlanner = () => {
-  const { events, posts, movePost, addPost, updatePost, deletePost, addEvent, updateEvent, deleteEvent, isLoading } = useCalendar();
+  const { events, posts, movePost, addPost, updatePost, deletePost, addEvent, updateEvent, deleteEvent, isLoading, populateHolidays } = useCalendar();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>('month');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -554,7 +555,30 @@ export const AgencyPlanner = () => {
               </div>
             </div>
 
-            <div className="w-full flex items-center justify-center sm:w-auto">
+            <div className="w-full flex items-center justify-center sm:w-auto gap-2">
+              <button
+                onClick={async () => {
+                  const yearInput = window.prompt('Enter year to populate holidays for:', '2026');
+                  if (!yearInput) return;
+                  
+                  const year = parseInt(yearInput);
+                  if (isNaN(year) || year < 2020 || year > 2030) {
+                    alert('Please enter a valid year between 2020 and 2030');
+                    return;
+                  }
+
+                  if (confirm(`Auto-populate Singapore Public Holidays & Retail Events for ${year}?`)) {
+                    await populateHolidays(year);
+                    triggerCheckmarkConfetti();
+                  }
+                }}
+                className="hidden sm:flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-all duration-200 hover-lift shadow-sm"
+                title="Auto-populate Holidays"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="hidden lg:inline">Auto-populate</span>
+              </button>
+
               <div className="flex items-center bg-gray-100 rounded-lg p-1 w-full sm:w-auto justify-center">
                 <button
                   onClick={() => setView('month')}
