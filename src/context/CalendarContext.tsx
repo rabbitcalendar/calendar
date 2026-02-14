@@ -468,7 +468,13 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
       try {
         const { data: eventsData, error } = await client.from('events').select('*');
         if (error) throw error;
-        if (eventsData) setAllEvents(eventsData);
+        if (eventsData) {
+          const mappedEvents = eventsData.map((e: any) => ({
+            ...e,
+            clientId: e.client_id || e.clientId // Handle snake_case from DB
+          }));
+          setAllEvents(mappedEvents);
+        }
       } catch (err) {
         console.warn('Supabase Error (Events):', err);
       }
@@ -479,6 +485,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         if (postsData) {
           const mappedPosts = postsData.map((p: any) => ({
             ...p,
+            clientId: p.client_id || p.clientId, // Handle snake_case from DB
             contentType: p.content_type,
             imageUrl: p.image_url
           }));
