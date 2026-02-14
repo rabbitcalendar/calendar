@@ -710,9 +710,18 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         const dbEvents = newEvents.map(e => {
             const dbE = { ...e, client_id: e.clientId };
             delete (dbE as any).clientId;
-            return dbE;
+            // Ensure no other unexpected fields are present
+            return {
+              id: dbE.id,
+              client_id: dbE.client_id,
+              title: dbE.title,
+              date: dbE.date,
+              type: dbE.type,
+              description: dbE.description
+            };
         });
         
+        console.log('Sending payload to Supabase (Events):', dbEvents); // Debug payload
         const { error } = await supabase.from('events').insert(dbEvents);
         if (error) throw error;
         console.log(`Successfully populated ${newEvents.length} holidays for client ${currentClient.id}`);
