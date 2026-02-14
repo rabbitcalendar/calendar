@@ -1,5 +1,5 @@
 import type { CalendarEvent } from '../types';
-import { addDays, format, getDay, startOfMonth, setDay, addWeeks, subDays } from 'date-fns';
+import { addDays, format, getDay, startOfMonth, subDays } from 'date-fns';
 
 // Type definition for holiday object
 type HolidayBase = Omit<CalendarEvent, 'id' | 'clientId'>;
