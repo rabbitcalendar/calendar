@@ -741,9 +741,11 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         
         if (error) {
           console.error('Error populating holidays:', error);
+          alert(`Failed to save holidays: ${error.message} (${error.code}) \nHint: ${error.hint || 'No hint'} \nDetails: ${error.details || 'No details'}`);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Exception populating holidays:', err);
+        alert(`Exception saving holidays: ${err.message || err}`);
       }
     }
   };
