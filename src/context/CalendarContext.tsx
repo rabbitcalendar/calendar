@@ -616,10 +616,11 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (isSupabaseConfigured && supabase) {
+      // Use camelCase column names to match DB schema
       const dbData: any = { ...data };
       if (data.themeColor) {
-        dbData.theme_color = data.themeColor;
-        delete dbData.themeColor;
+        dbData.themeColor = data.themeColor;
+        // Don't convert to snake_case theme_color
       }
       await supabase.from('clients').update(dbData).eq('id', id);
     }
@@ -633,17 +634,17 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     setAllEvents([...allEvents, newEvent]);
     if (isSupabaseConfigured && supabase) {
       try {
+        // Use camelCase column names to match DB schema
         const dbEvent = {
             ...newEvent,
-            client_id: newEvent.clientId
+            clientId: newEvent.clientId
         };
-        delete (dbEvent as any).clientId;
         
         const { error } = await supabase.from('events').insert([dbEvent]);
         if (error) throw error;
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error adding event:', err);
-        // Silent fail for now to match previous behavior but logging it
+        alert(`Failed to add event: ${err.message || err.toString()} \nHint: ${err.hint || 'No hint'}`);
       }
     }
   };
@@ -652,16 +653,17 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     setAllEvents(allEvents.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)));
     if (isSupabaseConfigured && supabase) {
       try {
+         // Use camelCase column names to match DB schema
          const dbEvent = {
             ...updatedEvent,
-            client_id: updatedEvent.clientId
+            clientId: updatedEvent.clientId
         };
-        delete (dbEvent as any).clientId;
 
         const { error } = await supabase.from('events').update(dbEvent).eq('id', updatedEvent.id);
         if (error) throw error;
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error updating event:', err);
+        alert(`Failed to update event: ${err.message || err.toString()} \nHint: ${err.hint || 'No hint'}`);
       }
     }
   };
@@ -714,7 +716,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
             username: currentClient.username,
             password: currentClient.password,
             role: currentClient.role,
-            theme_color: currentClient.themeColor || 'indigo'
+            themeColor: currentClient.themeColor || 'indigo'
         }, { onConflict: 'id' });
 
         if (clientError) {
@@ -755,22 +757,19 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSupabaseConfigured && supabase) {
       try {
+        // Use camelCase column names to match DB schema
         const dbPost = {
           ...newPost,
-          client_id: newPost.clientId,
-          content_type: newPost.contentType,
-          image_url: newPost.imageUrl
+          clientId: newPost.clientId,
+          contentType: newPost.contentType,
+          imageUrl: newPost.imageUrl
         };
-        delete (dbPost as any).clientId;
-        delete (dbPost as any).contentType;
-        delete (dbPost as any).imageUrl;
         
         const { error } = await supabase.from('posts').insert([dbPost]);
         if (error) throw error;
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error adding post to Supabase:', err);
-        // Revert local state or alert user
-        alert('Failed to save post to database. Please check console for details.');
+        alert(`Failed to save post: ${err.message || err.toString()} \nHint: ${err.hint || 'No hint'}`);
       }
     }
   };
@@ -780,21 +779,19 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSupabaseConfigured && supabase) {
       try {
+        // Use camelCase column names to match DB schema
         const dbPost = {
           ...updatedPost,
-          client_id: updatedPost.clientId,
-          content_type: updatedPost.contentType,
-          image_url: updatedPost.imageUrl
+          clientId: updatedPost.clientId,
+          contentType: updatedPost.contentType,
+          imageUrl: updatedPost.imageUrl
         };
-        delete (dbPost as any).clientId;
-        delete (dbPost as any).contentType;
-        delete (dbPost as any).imageUrl;
 
         const { error } = await supabase.from('posts').update(dbPost).eq('id', updatedPost.id);
         if (error) throw error;
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error updating post in Supabase:', err);
-        alert('Failed to update post in database. Please check console for details.');
+        alert(`Failed to update post: ${err.message || err.toString()} \nHint: ${err.hint || 'No hint'}`);
       }
     }
   };
