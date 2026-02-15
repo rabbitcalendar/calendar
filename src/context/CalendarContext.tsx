@@ -723,16 +723,15 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         }
 
         const dbEvents = uniqueNewEvents.map(e => {
-            const dbE = { ...e, client_id: e.clientId };
-            delete (dbE as any).clientId;
-            // Ensure no other unexpected fields are present
+            // Check if we should use snake_case or camelCase
+            // Based on error "Could not find the 'client_id' column", we try camelCase 'clientId'
             return {
-              id: dbE.id,
-              client_id: dbE.client_id,
-              title: dbE.title,
-              date: dbE.date,
-              type: dbE.type,
-              description: dbE.description
+              id: e.id,
+              clientId: e.clientId, // Try camelCase matching the type
+              title: e.title,
+              date: e.date,
+              type: e.type,
+              description: e.description
             };
         });
         
