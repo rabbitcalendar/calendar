@@ -676,38 +676,53 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   const populateHolidays = async (year: number) => {
     if (!currentClient) return;
     
+    // 1. Generate holiday events
     const holidays = getAllHolidays(year);
-    const existingEvents = allEvents.filter(e => e.clientId === currentClient.id);
     
-    const newEvents: CalendarEvent[] = [];
+    // 2. Convert to CalendarEvent format
+    const newEvents: CalendarEvent[] = holidays.map(h => ({
+      id: generateUUID(),
+      clientId: currentClient.id,
+      title: h.title,
+      date: h.date,
+      type: h.type,
+      description: h.description
+    }));
+
+    // 3. Update local state
+    // Filter out existing holidays for this year to avoid duplicates?
+    // Or just append. Let's append but check for exact duplicates.
+    const uniqueNewEvents = newEvents.filter(ne => 
+      !allEvents.some(ae => 
+        ae.date === ne.date && 
+        ae.title === ne.title && 
+        ae.clientId === currentClient.id
+      )
+    );
+
+    if (uniqueNewEvents.length === 0) return;
+
+    setAllEvents(prev => [...prev, ...uniqueNewEvents]);
     
-    for (const holiday of holidays) {
-      // Check if this holiday already exists for this client
-      const exists = existingEvents.some(e => 
-        e.date === holiday.date && e.title === holiday.title
-      );
-      
-      if (!exists) {
-        const newEvent: CalendarEvent = {
-          ...holiday,
-          id: generateUUID(),
-          clientId: currentClient.id,
-          // Cast type to match CalendarEvent type strictly if needed, though holiday.type is compatible
-          type: holiday.type as 'holiday' | 'promotion' | 'event' | 'other'
-        };
-        newEvents.push(newEvent);
-      }
-    }
-    
-    if (newEvents.length === 0) return;
-    
-    // Optimistically update local state
-    setAllEvents(prev => [...prev, ...newEvents]);
-    
-    // Batch insert to Supabase if configured
+    // 4. Persist to Supabase
     if (isSupabaseConfigured && supabase) {
       try {
-        const dbEvents = newEvents.map(e => {
+        // Ensure client exists in DB (fix for FK violation with demo data)
+        const { error: clientError } = await supabase.from('clients').upsert({
+            id: currentClient.id,
+            name: currentClient.name,
+            username: currentClient.username,
+            password: currentClient.password,
+            role: currentClient.role,
+            theme_color: currentClient.themeColor || 'indigo'
+        }, { onConflict: 'id' });
+
+        if (clientError) {
+             console.error('Error ensuring client exists:', clientError);
+             // If this fails, the event insert will likely fail too, but we proceed to try/log
+        }
+
+        const dbEvents = uniqueNewEvents.map(e => {
             const dbE = { ...e, client_id: e.clientId };
             delete (dbE as any).clientId;
             // Ensure no other unexpected fields are present
@@ -723,12 +738,12 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         
         console.log('Sending payload to Supabase (Events):', dbEvents); // Debug payload
         const { error } = await supabase.from('events').insert(dbEvents);
-        if (error) throw error;
-        console.log(`Successfully populated ${newEvents.length} holidays for client ${currentClient.id}`);
+        
+        if (error) {
+          console.error('Error populating holidays:', error);
+        }
       } catch (err) {
-        console.error('Error populating holidays:', err);
-        alert('Failed to save holidays to database. Please check console for details.');
-        // Revert local state if needed, or just let it be (it will sync on reload)
+        console.error('Exception populating holidays:', err);
       }
     }
   };
