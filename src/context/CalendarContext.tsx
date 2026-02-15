@@ -82,30 +82,30 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   // Load from local storage or use initial data
   const [clients, setClients] = useState<Client[]>(() => {
     try {
-      const saved = localStorage.getItem('calendar_clients');
+      const saved = localStorage.getItem('calendar_clients_v2');
       return saved ? JSON.parse(saved) : INITIAL_CLIENTS;
     } catch (e) {
-      console.error('Failed to parse calendar_clients', e);
+      console.error('Failed to parse calendar_clients_v2', e);
       return INITIAL_CLIENTS;
     }
   });
 
   const [user, setUser] = useState<Client | null>(() => {
     try {
-      const saved = localStorage.getItem('calendar_user');
+      const saved = localStorage.getItem('calendar_user_v2');
       return saved ? JSON.parse(saved) : null;
     } catch (e) {
-      console.error('Failed to parse calendar_user', e);
+      console.error('Failed to parse calendar_user_v2', e);
       return null;
     }
   });
 
   const [currentClient, setCurrentClientState] = useState<Client | null>(() => {
     try {
-      const saved = localStorage.getItem('calendar_current_client');
+      const saved = localStorage.getItem('calendar_current_client_v2');
       return saved ? JSON.parse(saved) : null;
     } catch (e) {
-      console.error('Failed to parse calendar_current_client', e);
+      console.error('Failed to parse calendar_current_client_v2', e);
       return null;
     }
   });
@@ -124,26 +124,26 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
 
   const [allEvents, setAllEvents] = useState<CalendarEvent[]>(() => {
     try {
-      const saved = localStorage.getItem('calendar_events');
+      const saved = localStorage.getItem('calendar_events_v2');
       return saved ? JSON.parse(saved) : INITIAL_EVENTS;
     } catch (e) {
-      console.error('Failed to parse calendar_events', e);
+      console.error('Failed to parse calendar_events_v2', e);
       return INITIAL_EVENTS;
     }
   });
 
   const [allPosts, setAllPosts] = useState<SocialPost[]>(() => {
     try {
-      const saved = localStorage.getItem('calendar_posts');
+      const saved = localStorage.getItem('calendar_posts_v2');
       return saved ? JSON.parse(saved) : INITIAL_POSTS;
     } catch (e) {
-      console.error('Failed to parse calendar_posts', e);
+      console.error('Failed to parse calendar_posts_v2', e);
       return INITIAL_POSTS;
     }
   });
 
   const [projectName, setProjectName] = useState<string>(() => {
-    return localStorage.getItem('calendar_project_name') || 'ContentCal';
+    return localStorage.getItem('calendar_project_name_v2') || 'ContentCal';
   });
 
   // Filtered data based on current client
@@ -508,35 +508,35 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
 
   // Local Storage Sync
   useEffect(() => {
-    localStorage.setItem('calendar_clients', JSON.stringify(clients));
+    localStorage.setItem('calendar_clients_v2', JSON.stringify(clients));
   }, [clients]);
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('calendar_user', JSON.stringify(user));
+      localStorage.setItem('calendar_user_v2', JSON.stringify(user));
     } else {
-      localStorage.removeItem('calendar_user');
+      localStorage.removeItem('calendar_user_v2');
     }
   }, [user]);
 
   useEffect(() => {
     if (currentClient) {
-      localStorage.setItem('calendar_current_client', JSON.stringify(currentClient));
+      localStorage.setItem('calendar_current_client_v2', JSON.stringify(currentClient));
     } else {
-      localStorage.removeItem('calendar_current_client');
+      localStorage.removeItem('calendar_current_client_v2');
     }
   }, [currentClient]);
 
   useEffect(() => {
-    localStorage.setItem('calendar_events', JSON.stringify(allEvents));
+    localStorage.setItem('calendar_events_v2', JSON.stringify(allEvents));
   }, [allEvents]);
 
   useEffect(() => {
-    localStorage.setItem('calendar_posts', JSON.stringify(allPosts));
+    localStorage.setItem('calendar_posts_v2', JSON.stringify(allPosts));
   }, [allPosts]);
 
   useEffect(() => {
-    localStorage.setItem('calendar_project_name', projectName);
+    localStorage.setItem('calendar_project_name_v2', projectName);
   }, [projectName]);
 
   // Apply Theme
