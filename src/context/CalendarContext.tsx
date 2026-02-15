@@ -50,33 +50,33 @@ export const useCalendar = () => {
   return context;
 };
 
-// Initial dummy data for demonstration
-const INITIAL_CLIENTS: Client[] = [
-  { 
-    id: '1', 
-    name: 'Rabbit', 
-    username: 'rabbit',
-    password: 'password123',
-    role: 'agency'
-  },
-  { 
-    id: '2', 
-    name: 'Coca Cola', 
-    username: 'coke',
-    password: 'password123',
-    role: 'client'
-  }
-];
-
-const INITIAL_EVENTS: CalendarEvent[] = [
-  { id: '1', clientId: '2', title: 'New Year Sale', date: '2026-01-01', type: 'promotion', description: 'Site-wide sale' },
-  { id: '2', clientId: '2', title: 'Product Launch', date: '2026-01-15', type: 'event', description: 'Launching the new gadget' },
-];
-
-const INITIAL_POSTS: SocialPost[] = [
-  { id: '1', clientId: '2', title: 'Teaser Video', date: '2026-01-10', platform: 'instagram', contentType: 'video', brief: 'Short teaser for the launch', status: 'draft' },
-  { id: '2', clientId: '2', title: 'Launch Announcement', date: '2026-01-15', platform: 'facebook', contentType: 'text', brief: 'Official announcement post', status: 'scheduled' },
-];
+  // Initial dummy data for demonstration
+  const INITIAL_CLIENTS: Client[] = [
+    { 
+      id: '00000000-0000-0000-0000-000000000001', 
+      name: 'Rabbit', 
+      username: 'rabbit',
+      password: 'password123',
+      role: 'agency'
+    },
+    { 
+      id: '00000000-0000-0000-0000-000000000002', 
+      name: 'Coca Cola', 
+      username: 'coke',
+      password: 'password123',
+      role: 'client'
+    }
+  ];
+  
+  const INITIAL_EVENTS: CalendarEvent[] = [
+    { id: '1', clientId: '00000000-0000-0000-0000-000000000002', title: 'New Year Sale', date: '2026-01-01', type: 'promotion', description: 'Site-wide sale' },
+    { id: '2', clientId: '00000000-0000-0000-0000-000000000002', title: 'Product Launch', date: '2026-01-15', type: 'event', description: 'Launching the new gadget' },
+  ];
+  
+  const INITIAL_POSTS: SocialPost[] = [
+    { id: '1', clientId: '00000000-0000-0000-0000-000000000002', title: 'Teaser Video', date: '2026-01-10', platform: 'instagram', contentType: 'video', brief: 'Short teaser for the launch', status: 'draft' },
+    { id: '2', clientId: '00000000-0000-0000-0000-000000000002', title: 'Launch Announcement', date: '2026-01-15', platform: 'facebook', contentType: 'text', brief: 'Official announcement post', status: 'scheduled' },
+  ];
 
 export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   // Load from local storage or use initial data
@@ -628,7 +628,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   const addEvent = async (event: CalendarEvent) => {
     // Ensure event has a valid UUID if not provided (though usually provided by UI)
     const eventId = event.id && event.id.length > 20 ? event.id : generateUUID();
-    const newEvent = { ...event, id: eventId, clientId: currentClient?.id || '1' };
+    const newEvent = { ...event, id: eventId, clientId: currentClient?.id || '00000000-0000-0000-0000-000000000001' };
     
     setAllEvents([...allEvents, newEvent]);
     if (isSupabaseConfigured && supabase) {
@@ -734,7 +734,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addPost = async (post: SocialPost) => {
-    const newPost = { ...post, clientId: currentClient?.id || '1' };
+    const newPost = { ...post, clientId: currentClient?.id || '00000000-0000-0000-0000-000000000001' };
     setAllPosts([...allPosts, newPost]);
     
     if (isSupabaseConfigured && supabase) {
